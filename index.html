@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>経営健康診断｜あなたの会社の今がわかる5分間チェック</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#F7F9FC',
+                            main: '#1A3A5C',
+                            accent: '#2EB8A0',
+                            safe: '#27AE60',
+                            notice: '#F5A623',
+                            warning: '#E05C5C',
+                            improve: '#F39C12', /* 要改善用オレンジ */
+                            card: '#FFFFFF',
+                            text: '#2C2C2C',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #F7F9FC;
+            color: #2C2C2C;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* カスタムラジオボタン */
+        .custom-radio input:checked + div {
+            border-color: #2EB8A0;
+            background-color: #E6F7F4;
+        }
+        .custom-radio input:checked + div .radio-mark {
+            border-color: #2EB8A0;
+        }
+        .custom-radio input:checked + div .radio-mark::after {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            background-color: #2EB8A0;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 円形ゲージ */
+        .circular-chart {
+            display: block;
+            margin: 0 auto;
+            max-width: 280px;
+            max-height: 280px;
+        }
+        .circle-bg {
+            fill: none;
+            stroke: #E2E8F0;
+            stroke-width: 2.5;
+        }
+        .circle {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            transition: stroke-dasharray 2s ease-out, stroke 1s ease-out;
+            stroke: #E2E8F0; /* 初期色 */
+        }
+        
+        /* ぼかしUI用 */
+        .blur-ui {
+            filter: blur(5px);
+            opacity: 0.6;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* ローディングアニメーション */
+        .pulse-loader {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #2EB8A0;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        /* 印刷用スタイル */
+        @media print {
+            body { background-color: #FFFFFF; }
+            .no-print { display: none !important; }
+            .print-shadow-none { box-shadow: none !important; border: 1px solid #E2E8F0; }
+            #app-container { max-width: 100% !important; padding: 0 !important; }
+            .page-break { page-break-before: always; }
+        }
+        
+        /* 隠し要素 */
+        .hidden-screen { display: none !important; }
+
+        /* --- ダークモード用スタイルオーバーライド --- */
+        .dark body { background-color: #111827; color: #E5E7EB; }
+        .dark .bg-white, .dark .dark-bg-white { background-color: #1F2937 !important; border-color: #374151; }
+        .dark .bg-brand-bg { background-color: #374151 !important; border-color: #4B5563; }
+        .dark .text-brand-main { color: #93C5FD !important; }
+        .dark .text-brand-text { color: #D1D5DB !important; }
+        .dark .text-gray-500, .dark .text-gray-600, .dark .text-gray-700 { color: #9CA3AF !important; }
+        .dark .border-gray-200, .dark .border-t, .dark .dark-border-gray, .dark .dark-border-b { border-color: #374151 !important; }
+        .dark .custom-radio input:checked + div { background-color: #134E4A !important; border-color: #2EB8A0 !important; }
+        .dark .circle-bg { stroke: #374151 !important; }
+        .dark header { background-color: #0B1B2E !important; }
+        .dark .bg-gray-50, .dark .bg-gray-100 { background-color: #374151 !important; }
+        .dark .bg-gray-200 { background-color: #4B5563 !important; color: #E5E7EB !important;}
+        .dark .blur-ui { background-color: rgba(31, 41, 55, 0.8) !important; }
+        .dark .bg-white.bg-opacity-80 { background-color: rgba(31, 41, 55, 0.9) !important; }
+        .dark .bg-green-50 { background-color: rgba(6, 78, 59, 0.3) !important; border-color: #065F46 !important;}
+        .dark .text-gray-800 { color: #E5E7EB !important; }
+        .dark .bg-orange-50 { background-color: rgba(124, 45, 18, 0.3) !important; border-color: #9A3412 !important;}
+        .dark .shadow-md, .dark .shadow-sm { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important; }
+        .dark .dark-btn-close { background-color: #374151 !important; color: #D1D5DB !important; }
+        .dark .dark-btn-close:hover { background-color: #4B5563 !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+
+    <!-- ヘッダー -->
+    <header class="w-full bg-brand-main text-white py-4 shadow-md z-10 transition-colors">
+        <div class="max-w-3xl mx-auto px-4 flex justify-between items-center">
+            <div>
+                <p class="text-xs text-brand-accent font-semibold tracking-wider mb-1">5分でわかる、あなたの会社の今</p>
+                <h1 class="text-lg md:text-xl font-bold">経営健康診断</h1>
+            </div>
+            <div class="flex space-x-4">
+                <button onclick="openHelpModal()" class="flex flex-col items-center justify-center text-gray-300 hover:text-white transition-colors" title="使い方">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-[10px] mt-1">使い方</span>
+                </button>
+                <button onclick="openSettingsModal()" class="flex flex-col items-center justify-center text-gray-300 hover:text-white transition-colors" title="設定">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="text-[10px] mt-1">設定</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテナ -->
+    <main id="app-container" class="w-full max-w-3xl flex-grow px-4 py-8 pb-24">
+        
+        <!-- ================= スタート画面 ================= -->
+        <section id="screen-start" class="w-full max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 text-center border-t-4 border-brand-accent">
+                <div class="w-20 h-20 bg-brand-bg rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-brand-main mb-4">会社の「健康状態」<br class="md:hidden">チェックしましょう</h2>
+                <p class="text-brand-text mb-6 leading-relaxed text-sm md:text-base text-left md:text-center">
+                    病院で健康診断を受けるように、会社の経営状態も定期的なチェックが必要です。<br>
+                    直感的な5つの質問に答えるだけで、あなたの会社の「今」がわかります。<br>
+                    税理士との面談前に実施していただくことで、より有意義なアドバイスが可能になります。
+                </p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8 text-sm">
+                    <div class="bg-brand-bg p-4 rounded-xl">
+                        <span class="block text-brand-accent font-bold text-lg mb-1">5分</span>
+                        <span class="text-gray-600">で完了します</span>
+                    </div>
+                    <div class="bg-brand-bg p-4 rounded-xl">
+                        <span class="block text-brand-accent font-bold text-lg mb-1">5軸</span>
+                        <span class="text-gray-600">から総合評価</span>
+                    </div>
+                </div>
+
+                <button onclick="startDiagnosis()" class="w-full md:w-auto px-12 py-4 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105">
+                    診断をスタートする
+                </button>
+            </div>
+            
+            <!-- 過去の結果がある場合 -->
+            <div id="previous-result-area" class="mt-6 text-center hidden-screen">
+                <button onclick="showResultScreen()" class="text-brand-main font-medium underline text-sm hover:text-brand-accent">
+                    前回の診断結果を見る
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= 質問画面 ================= -->
+        <section id="screen-question" class="hidden-screen w-full max-w-2xl mx-auto">
+            <!-- プログレスバー -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs font-semibold text-gray-500 mb-2">
+                    <span id="progress-text">軸 1 / 5</span>
+                    <span id="category-title-progress" class="text-brand-main">収益力</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-brand-accent h-2.5 rounded-full transition-all duration-500" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <!-- 質問カード -->
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 border-t-4 border-brand-main">
+                <h3 id="category-title" class="text-xl font-bold text-brand-main mb-6 flex items-center border-b pb-4">
+                    <span class="bg-brand-main text-white text-sm py-1 px-3 rounded-full mr-3" id="category-badge">Q1</span>
+                    収益力
+                </h3>
+                
+                <div id="questions-container" class="space-y-8">
+                    <!-- JavaScriptで質問を動的生成 -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center pt-6 border-t">
+                    <button onclick="prevCategory()" id="btn-prev" class="px-6 py-3 text-brand-main font-medium hover:bg-brand-bg rounded-lg transition-colors hidden">
+                        戻る
+                    </button>
+                    <div class="flex-grow"></div>
+                    <button onclick="nextCategory()" id="btn-next" class="px-8 py-3 bg-brand-accent text-white font-bold rounded-lg shadow-md hover:bg-teal-500 transition-colors opacity-50 cursor-not-allowed" disabled>
+                        次へ進む
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ローディング画面 ================= -->
+        <section id="screen-loading" class="hidden-screen w-full h-64 flex flex-col items-center justify-center">
+            <div class="pulse-loader mb-6"></div>
+            <h2 class="text-xl font-bold text-brand-main mb-2">診断結果を分析中...</h2>
+            <p class="text-gray-500 text-sm">入力されたデータを元に経営健康状態を判定しています</p>
+        </section>
+
+        <!-- ================= 結果画面 ================= -->
+        <section id="screen-result" class="hidden-screen w-full">
+            
+            <!-- 総合スコア -->
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 mb-6 text-center border-t-8 print-shadow-none" id="result-header-border">
+                <p class="text-sm font-semibold text-gray-500 mb-2">あなたの会社の</p>
+                <h2 class="text-2xl font-bold text-brand-main mb-6">総合経営健康スコア</h2>
+                
+                <div class="relative w-64 h-64 mx-auto mb-4">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg"
+                          d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path class="circle" id="score-circle" stroke-dasharray="0, 100"
+                          d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <text x="18" y="16" class="percentage text-gray-500" style="font-size: 0.25em;">スコア</text>
+                        <text x="18" y="24" class="percentage" id="score-text" style="font-size: 0.6em; font-weight: bold; fill: #1A3A5C;">0</text>
+                        <text x="26" y="24" class="percentage text-gray-500" style="font-size: 0.25em;">点</text>
+                    </svg>
+                </div>
+                
+                <div class="inline-block px-6 py-2 rounded-full font-bold text-lg mb-4" id="score-badge">
+                    評価：---
+                </div>
+                <p class="text-lg font-bold" id="score-short-msg">---</p>
+            </div>
+
+            <!-- メッセージカード -->
+            <div class="bg-brand-bg rounded-2xl p-6 mb-8 border border-gray-200 print-shadow-none">
+                <div class="flex items-start">
+                    <div class="text-3xl mr-4" id="message-icon">👩‍💼</div>
+                    <div>
+                        <h3 class="font-bold text-brand-main mb-2">総評コメント</h3>
+                        <p class="text-brand-text leading-relaxed text-sm md:text-base" id="overall-message">
+                            <!-- JSで挿入 -->
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- レーダーチャート -->
+                <div class="bg-white rounded-2xl shadow-md p-6 print-shadow-none flex flex-col items-center">
+                    <h3 class="font-bold text-brand-main mb-4 text-center w-full border-b pb-2">経営バランス分析</h3>
+                    <div class="w-full max-w-[300px] aspect-square relative">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500 text-center w-full">
+                        ※薄いグレーの線は一般的な中小企業の平均目安(60点)です。
+                    </div>
+                </div>
+
+                <!-- 強みと課題 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 print-shadow-none flex flex-col">
+                    <h3 class="font-bold text-brand-main mb-4 border-b pb-2">あなたの会社の強みと課題</h3>
+                    
+                    <div class="mb-4 flex-grow">
+                        <h4 class="text-sm font-bold text-brand-safe mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            強み（スコア上位）
+                        </h4>
+                        <div id="strengths-container" class="space-y-2">
+                            <!-- JSで挿入 -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-bold text-brand-improve mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            改善が必要なポイント（スコア下位）
+                        </h4>
+                        <div id="weaknesses-container" class="space-y-2">
+                            <!-- JSで挿入 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 軸別スコアカード -->
+            <h3 class="font-bold text-brand-main text-lg mb-4 px-2">カテゴリ別詳細</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 page-break" id="category-scores-container">
+                <!-- JSで挿入 -->
+            </div>
+
+            <!-- アクションカード -->
+            <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-brand-main mb-8 print-shadow-none">
+                <h3 class="font-bold text-brand-main text-lg mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    次の一手（推奨アクション）
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">現在のスコアに基づき、今後優先的に取り組むべきアクションをご提案します。</p>
+                <ul class="space-y-3" id="action-list">
+                    <!-- JSで挿入 -->
+                </ul>
+            </div>
+
+            <!-- ================= Pro版案内ゾーン ================= -->
+            <div class="relative bg-white rounded-2xl shadow-md overflow-hidden mb-8 no-print border border-gray-100">
+                <!-- 背景ぼかしUI -->
+                <div class="p-6 blur-ui bg-gray-50">
+                    <div class="h-4 bg-gray-200 rounded w-1/3 mb-6"></div>
+                    <div class="h-32 bg-gray-200 rounded-lg mb-4"></div>
+                    <div class="space-y-2">
+                        <div class="h-3 bg-gray-200 rounded w-full"></div>
+                        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+                        <div class="h-3 bg-gray-200 rounded w-4/6"></div>
+                    </div>
+                </div>
+                
+                <!-- オーバーレイ内容 -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-80 p-6 text-center">
+                    <div class="bg-gradient-to-r from-brand-main to-brand-accent text-white text-xs font-bold px-3 py-1 rounded-full mb-3 shadow">
+                        Pro Version
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-main mb-2">AIがあなたの会社を詳しく分析します</h3>
+                    <p class="text-sm text-gray-600 mb-6 max-w-md">
+                        AIによる具体的な改善レポート生成、同業他社との比較、過去からのスコア推移グラフなど、経営改善をさらに加速させる機能を利用できます。
+                    </p>
+                    <button onclick="openProModal()" class="px-8 py-3 bg-brand-main hover:bg-gray-800 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Pro版の詳細を見る
+                    </button>
+                </div>
+            </div>
+
+            <!-- アクションボタン群 -->
+            <div class="flex flex-col md:flex-row gap-4 justify-center mt-10 mb-8 no-print">
+                <button onclick="sendToTaxAccountant()" class="px-6 py-3 bg-brand-main text-white font-bold rounded-lg shadow hover:bg-gray-800 flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    結果を税理士に送る
+                </button>
+                <button onclick="window.print()" class="px-6 py-3 bg-white border border-gray-300 text-brand-text font-bold rounded-lg shadow hover:bg-gray-50 flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    結果を印刷・PDF保存
+                </button>
+                <button onclick="resetDiagnosis()" class="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors">
+                    もう一度最初から
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="w-full bg-white border-t border-gray-200 py-6 mt-auto">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <p class="text-xs text-gray-500 leading-relaxed">
+                【免責事項】この診断はセルフチェックのための参考情報を提供するものです。<br class="hidden md:inline">
+                診断結果は入力されたデータに基づく簡易的なものであり、実際の財務状況や経営課題を完全に網羅・保証するものではありません。<br class="hidden md:inline">
+                詳細な経営判断や財務改善にあたっては、必ず税理士や専門家にご相談ください。
+            </p>
+            <p class="text-xs text-gray-400 mt-4">&copy; 2026 Smile Plus Consulting. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ================= Pro版モーダル ================= -->
+    <div id="modal-pro" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden-screen px-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+            <div class="bg-brand-main text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    AI経営健康診断 Pro版
+                </h3>
+                <button onclick="closeProModal()" class="text-gray-300 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm font-semibold text-brand-accent mb-4">この機能はPro版（有料プラン）でご利用いただけます。</p>
+                
+                <ul class="space-y-3 mb-6 text-sm text-gray-700">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Claude AIによる「あなた専用の経営改善レポート」自動生成
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        同業種・同規模の平均との高度な比較分析
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        月次診断の履歴保存とスコア推移グラフ表示
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        顧問先別スコア管理（税理士事務所向け管理画面）
+                    </li>
+                </ul>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 text-sm text-center">
+                    税理士事務所様向けのライセンスプランをご用意しております。<br>
+                    顧問先への付加価値提供ツールとしてご活用ください。
+                </div>
+
+                <div class="flex flex-col space-y-3">
+                    <a href="mailto:info@example.com?subject=経営健康診断Pro版に関するお問い合わせ" class="w-full py-3 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-lg shadow text-center transition-colors">
+                        詳細を問い合わせる（メール）
+                    </a>
+                    <button onclick="closeProModal()" class="w-full py-3 bg-white border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-colors">
+                        閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 使い方モーダル ================= -->
+    <div id="modal-help" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden-screen px-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all dark-bg-white">
+            <div class="bg-brand-main text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    目的と使い方
+                </h3>
+                <button onclick="closeHelpModal()" class="text-gray-300 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
+                <h4 class="font-bold text-brand-main mb-2 border-b pb-1 dark-border-b">目的</h4>
+                <p class="text-sm text-brand-text mb-6 leading-relaxed">
+                    このアプリは、経営者様が自社の財務や経営状態を直感的に把握し、健康状態をチェックするためのツールです。<br>
+                    定期的にチェックを行うことで、経営の課題を早期に発見し、税理士との面談をより有意義なものにすることを目的としています。
+                </p>
+                
+                <h4 class="font-bold text-brand-main mb-2 border-b pb-1 dark-border-b">使い方</h4>
+                <ul class="text-sm text-brand-text space-y-3 pl-1">
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">1.</span>
+                        「診断をスタートする」ボタンを押して開始します。
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">2.</span>
+                        5つのカテゴリ（収益力、資金安全性、業務効率、人材・組織、将来・成長性）に関する質問が順番に表示されます。
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">3.</span>
+                        各質問に対して、自社の状況に最も近い選択肢を選んでください。
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">4.</span>
+                        すべての質問に答えると、総合スコアとレーダーチャートで診断結果が表示されます。
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">5.</span>
+                        結果画面では、自社の強みや改善点、次に行うべき具体的なアクションを確認できます。
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-brand-accent font-bold mr-2">6.</span>
+                        結果は印刷やPDF保存、または税理士へメールで送信することが可能です。
+                    </li>
+                </ul>
+
+                <div class="mt-8 text-center">
+                    <button onclick="closeHelpModal()" class="w-full py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition-colors dark-btn-close">
+                        閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 設定モーダル ================= -->
+    <div id="modal-settings" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden-screen px-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all dark-bg-white">
+            <div class="bg-brand-main text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    設定
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-gray-300 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <h4 class="font-bold text-brand-main mb-3 text-sm">色合い（テーマ）</h4>
+                <div class="flex space-x-4 mb-8">
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="theme" value="light" class="peer sr-only" onchange="setTheme('light')" checked>
+                        <div class="text-center py-2 border-2 border-gray-200 rounded-lg peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all dark-border-gray text-gray-700 dark:text-gray-300">
+                            ☀️ ライト
+                        </div>
+                    </label>
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="theme" value="dark" class="peer sr-only" onchange="setTheme('dark')">
+                        <div class="text-center py-2 border-2 border-gray-200 rounded-lg peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all dark-border-gray text-gray-700 dark:text-gray-300">
+                            🌙 ダーク
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-4 mt-4 dark-border-gray">
+                    <div class="flex justify-between items-center text-xs text-gray-400">
+                        <button onclick="loadDemoData()" class="hover:text-brand-accent hover:underline transition-colors">
+                            デモデータを読み込む
+                        </button>
+                        <button onclick="clearAllData()" class="hover:text-brand-warning hover:underline transition-colors">
+                            すべてのデータをクリア
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript ロジック -->
+    <script>
+        // --- データ定義 ---
+        const diagnosisData = [
+            {
+                id: "revenue",
+                title: "収益力",
+                shortTitle: "収益力",
+                icon: "💰",
+                questions: [
+                    { id: "q1_1", text: "直近3ヶ月の売上傾向はどうですか？", options: [{ label: "増加している", score: 100 }, { label: "ほぼ横ばい", score: 50 }, { label: "減少している", score: 0 }] },
+                    { id: "q1_2", text: "売上に対する利益の感覚として近いものは？", options: [{ label: "十分残っている", score: 100 }, { label: "少し残っている", score: 60 }, { label: "ほとんど残らない", score: 20 }, { label: "赤字である", score: 0 }] },
+                    { id: "q1_3", text: "主力商品・サービスの価格競争状況は？", options: [{ label: "品質や独自性で選ばれている", score: 100 }, { label: "どちらともいえない・わからない", score: 50 }, { label: "価格の安さで選ばれている", score: 0 }] }
+                ],
+                comments: {
+                    high: "十分な収益力が確保されています。さらなる高付加価値化を目指しましょう。",
+                    mid: "収益力は安定しています。価格設定やコスト構造の見直しで利益率アップを。",
+                    low: "収益構造に課題があります。粗利率の改善か固定費の削減が急務です。"
+                }
+            },
+            {
+                id: "fund",
+                title: "資金安全性",
+                shortTitle: "安全性",
+                icon: "🏦",
+                questions: [
+                    { id: "q2_1", text: "現在の手元資金（現預金）で何ヶ月事業を継続できますか？", options: [{ label: "1年以上", score: 100 }, { label: "6〜12ヶ月", score: 70 }, { label: "3〜6ヶ月", score: 30 }, { label: "3ヶ月未満", score: 0 }] },
+                    { id: "q2_2", text: "借入金の返済状況はどうですか？", options: [{ label: "余裕がある・借入なし", score: 100 }, { label: "なんとか返せている（ギリギリ）", score: 40 }, { label: "遅れが出ている・リスケ中", score: 0 }] },
+                    { id: "q2_3", text: "急な出費（機械の故障など）が発生したときの対応力は？", options: [{ label: "自己資金ですぐ対応できる", score: 100 }, { label: "なんとか資金繰りできる", score: 50 }, { label: "対応が非常に厳しい", score: 0 }] }
+                ],
+                comments: {
+                    high: "資金繰りは非常に安定しています。投資への振り向けを検討できる状態です。",
+                    mid: "当面の資金に問題はありませんが、万が一の備え（キャッシュバッファ）を意識しましょう。",
+                    low: "手元資金に不安があります。早急な資金繰り表の作成と金融機関への相談を推奨します。"
+                }
+            },
+            {
+                id: "efficiency",
+                title: "業務効率",
+                shortTitle: "効率性",
+                icon: "⚙️",
+                questions: [
+                    { id: "q3_1", text: "日常業務のデジタル化・IT活用状況は？", options: [{ label: "クラウド等をフル活用している", score: 100 }, { label: "おおむねデジタル化している", score: 70 }, { label: "一部だけ導入している", score: 30 }, { label: "ほぼ紙・手作業である", score: 0 }] },
+                    { id: "q3_2", text: "社内にムダな作業・繰り返し作業は多いですか？", options: [{ label: "ほぼない・自動化されている", score: 100 }, { label: "少しあるが改善を進めている", score: 50 }, { label: "非常に多いと感じる", score: 0 }] },
+                    { id: "q3_3", text: "経営者自身が現場の作業から離れられていますか？", options: [{ label: "ほぼ従業員に任せられている", score: 100 }, { label: "半分程度は任せられている", score: 50 }, { label: "常に自分が現場に出ている", score: 0 }] }
+                ],
+                comments: {
+                    high: "効率的な業務体制が構築されています。仕組み化がうまくいっています。",
+                    mid: "一定の効率化はできていますが、ITツールの活用でまだ伸びしろがあります。",
+                    low: "属人的・非効率な作業が多い状態です。IT導入やアウトソースの検討が必要です。"
+                }
+            },
+            {
+                id: "hr",
+                title: "人材・組織",
+                shortTitle: "人材",
+                icon: "👥",
+                questions: [
+                    { id: "q4_1", text: "従業員の定着状況はどうですか？", options: [{ label: "長く定着し、安定している", score: 100 }, { label: "たまに辞める人がいる", score: 50 }, { label: "入退社が多く、よく辞める", score: 0 }] },
+                    { id: "q4_2", text: "後継者や右腕となる幹部候補はいますか？", options: [{ label: "明確にいる", score: 100 }, { label: "現在育成中である", score: 50 }, { label: "いない・適任者がいない", score: 0 }] },
+                    { id: "q4_3", text: "採用活動の状況はどうですか？", options: [{ label: "順調に採用できている", score: 100 }, { label: "苦戦しているがなんとかできている", score: 50 }, { label: "全く採用できていない", score: 0 }] }
+                ],
+                comments: {
+                    high: "組織の土台がしっかりしています。更なる社員のスキルアップ投資を行いましょう。",
+                    mid: "組織は概ね機能していますが、採用や定着において一部課題が見られます。",
+                    low: "人材不足や離職が経営のボトルネックになる恐れがあります。労働環境の見直しを。"
+                }
+            },
+            {
+                id: "future",
+                title: "将来・成長性",
+                shortTitle: "将来性",
+                icon: "🚀",
+                questions: [
+                    { id: "q5_1", text: "3年後のビジョンや目標が言語化・共有できていますか？", options: [{ label: "明確にあり、社内共有されている", score: 100 }, { label: "漠然とはあるが共有は不十分", score: 50 }, { label: "とくにない・日々の業務で精一杯", score: 0 }] },
+                    { id: "q5_2", text: "新商品開発や新規開拓など、新しいことへの挑戦状況は？", options: [{ label: "既に取り組み、成果が出始めている", score: 100 }, { label: "具体的な動きを始めている", score: 70 }, { label: "検討中だがまだ動けていない", score: 30 }, { label: "何もしていない", score: 0 }] },
+                    { id: "q5_3", text: "あなたの会社の業界全体の市場状況は？", options: [{ label: "成長・拡大傾向にある", score: 100 }, { label: "横ばい・変化が激しい", score: 50 }, { label: "縮小傾向・厳しい環境", score: 0 }] }
+                ],
+                comments: {
+                    high: "未来に向けた種まきができています。計画を実行に移し成長を加速させましょう。",
+                    mid: "将来の方向性は見えつつあります。具体的な行動計画に落とし込みましょう。",
+                    low: "現状維持バイアスがかかっています。中期的な視点でビジネスモデルを見直す時期です。"
+                }
+            }
+        ];
+
+        // --- ステート管理 ---
+        let currentCategoryIndex = 0;
+        let userAnswers = {}; // { q1_1: 100, ... }
+        let chartInstance = null;
+
+        // --- スコア評価ロジック ---
+        function getScoreEvaluation(score) {
+            if (score >= 80) return { 
+                color: '#27AE60', label: '優良', 
+                text: '経営の土台がしっかりしています', 
+                textColor: 'text-brand-safe', bg: 'bg-brand-safe', border: 'border-brand-safe',
+                msg: '素晴らしい状態です！経営の土台がしっかり整っています。この安定をベースに、次の成長ステージへの投資を検討してみましょう。税理士と一緒に攻めの経営戦略を考えるタイミングです。',
+                actions: ['投資・事業拡大のタイミングを税理士と検討する', '人材採用・育成への先行投資を考える', '補助金を活用した設備投資を検討する']
+            };
+            if (score >= 60) return { 
+                color: '#2EB8A0', label: '良好', 
+                text: '安定しています。さらなる改善で差がつきます', 
+                textColor: 'text-brand-accent', bg: 'bg-brand-accent', border: 'border-brand-accent',
+                msg: '全体的に安定していますが、いくつか気になるポイントがあります。放置すると後々響いてくる可能性があるため、強みを伸ばしつつ弱点を補強する取り組みを税理士と月次で確認していきましょう。',
+                actions: ['さらに利益率を高めるための価格改定を検討する', '属人化している業務のマニュアル化を進める', '中長期的な採用計画・育成計画を立てる']
+            };
+            if (score >= 40) return { 
+                color: '#F5A623', label: '注意', 
+                text: 'いくつかの課題があります。早めの対策を', 
+                textColor: 'text-brand-notice', bg: 'bg-brand-notice', border: 'border-brand-notice',
+                msg: '複数の課題が見えてきました。今は大丈夫でも、半年後・1年後に影響が出る可能性があります。まずは優先順位をつけて、一つずつ手を打っていきましょう。税理士への早めの相談をおすすめします。',
+                actions: ['資金繰り表を作成して毎月確認する習慣をつける', '固定費（不要な経費）の見直しから手をつける', 'IT導入補助金を活用した業務効率化を検討する']
+            };
+            if (score >= 20) return { 
+                color: '#F39C12', label: '要改善', 
+                text: '複数の課題が重なっています。専門家への相談を', 
+                textColor: 'text-brand-improve', bg: 'bg-brand-improve', border: 'border-brand-improve',
+                msg: '経営上のリスクが重なっている状態です。一人で抱え込まず、税理士や専門家と一緒に現状を整理することが最優先です。補助金や融資の活用も視野に入れて動きましょう。',
+                actions: ['早急に税理士と面談し、正確な財務状況を把握する', '不採算事業や無駄な経費の洗い出しを行う', '金融機関への現状報告と今後の相談の準備をする']
+            };
+            return { 
+                color: '#E05C5C', label: '危険', 
+                text: '早急な経営改善が必要な状態です。すぐに専門家へ', 
+                textColor: 'text-brand-warning', bg: 'bg-brand-warning', border: 'border-brand-warning',
+                msg: '緊急性の高い状況です。まず現金・資金繰りの状況を今すぐ確認してください。一人で判断せず、すぐに税理士・金融機関・専門家に連絡することを強くおすすめします。',
+                actions: ['最優先で当面の資金繰り（キャッシュ）を確保する', '一人で悩まず、直ちに税理士や専門家に緊急相談する', 'あらゆる支出を見直し、生存に向けた計画を練る']
+            };
+        }
+
+        // --- 初期化 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('keiei_shindan_result');
+            if (savedData) {
+                document.getElementById('previous-result-area').classList.remove('hidden-screen');
+            }
+            
+            // テーマの初期化
+            const savedTheme = localStorage.getItem('keiei_shindan_theme') || 'light';
+            setTheme(savedTheme, false);
+            const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
+            if (themeRadio) themeRadio.checked = true;
+        });
+
+        // --- 画面遷移制御 ---
+        function switchScreen(screenId) {
+            ['screen-start', 'screen-question', 'screen-loading', 'screen-result'].forEach(id => {
+                document.getElementById(id).classList.add('hidden-screen');
+            });
+            document.getElementById(screenId).classList.remove('hidden-screen');
+            window.scrollTo(0, 0);
+        }
+
+        function startDiagnosis() {
+            currentCategoryIndex = 0;
+            userAnswers = {};
+            renderCategory();
+            switchScreen('screen-question');
+        }
+
+        function resetDiagnosis() {
+            if(confirm('診断結果をリセットして最初からやり直しますか？')) {
+                localStorage.removeItem('keiei_shindan_result');
+                userAnswers = {};
+                switchScreen('screen-start');
+                document.getElementById('previous-result-area').classList.add('hidden-screen');
+            }
+        }
+
+        // --- 質問画面レンダリング ---
+        function renderCategory() {
+            const category = diagnosisData[currentCategoryIndex];
+            
+            // プログレス
+            document.getElementById('progress-text').innerText = `軸 ${currentCategoryIndex + 1} / 5`;
+            document.getElementById('category-title-progress').innerText = category.title;
+            const progressPercent = ((currentCategoryIndex) / 5) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            // タイトル
+            document.getElementById('category-badge').innerText = `軸 ${currentCategoryIndex + 1}`;
+            document.getElementById('category-title').innerHTML = `
+                <span class="bg-brand-main text-white text-sm py-1 px-3 rounded-full mr-3">軸 ${currentCategoryIndex + 1}</span>
+                ${category.icon} ${category.title}
+            `;
+
+            // 質問生成
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            category.questions.forEach((q, qIndex) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = "mb-6";
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, oIndex) => {
+                    const isChecked = userAnswers[q.id] === opt.score ? 'checked' : '';
+                    optionsHtml += `
+                        <label class="custom-radio cursor-pointer block mb-3 relative group">
+                            <input type="radio" name="${q.id}" value="${opt.score}" class="sr-only" onchange="handleAnswerChange()" ${isChecked}>
+                            <div class="border-2 border-gray-200 rounded-xl p-4 flex items-center transition-all group-hover:bg-gray-50">
+                                <div class="radio-mark w-5 h-5 rounded-full border-2 border-gray-300 mr-4 relative flex-shrink-0 transition-colors"></div>
+                                <span class="text-brand-text font-medium text-sm md:text-base">${opt.label}</span>
+                            </div>
+                        </label>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <p class="font-bold text-brand-main mb-3 leading-relaxed">
+                        <span class="text-brand-accent mr-1">Q${qIndex + 1}.</span> ${q.text}
+                    </p>
+                    <div>${optionsHtml}</div>
+                `;
+                container.appendChild(qDiv);
+            });
+
+            // ボタン状態更新
+            updateNavButtons();
+        }
+
+        function handleAnswerChange() {
+            const category = diagnosisData[currentCategoryIndex];
+            category.questions.forEach(q => {
+                const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+                if (selected) {
+                    userAnswers[q.id] = parseInt(selected.value, 10);
+                }
+            });
+            updateNavButtons();
+        }
+
+        function updateNavButtons() {
+            const category = diagnosisData[currentCategoryIndex];
+            const allAnswered = category.questions.every(q => userAnswers[q.id] !== undefined);
+            
+            const btnNext = document.getElementById('btn-next');
+            if (allAnswered) {
+                btnNext.disabled = false;
+                btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
+                if (currentCategoryIndex === diagnosisData.length - 1) {
+                    btnNext.innerText = "診断結果を見る";
+                } else {
+                    btnNext.innerText = "次へ進む";
+                }
+            } else {
+                btnNext.disabled = true;
+                btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            const btnPrev = document.getElementById('btn-prev');
+            if (currentCategoryIndex > 0) {
+                btnPrev.classList.remove('hidden');
+            } else {
+                btnPrev.classList.add('hidden');
+            }
+        }
+
+        function nextCategory() {
+            if (currentCategoryIndex < diagnosisData.length - 1) {
+                currentCategoryIndex++;
+                renderCategory();
+            } else {
+                calculateAndShowResult();
+            }
+        }
+
+        function prevCategory() {
+            if (currentCategoryIndex > 0) {
+                currentCategoryIndex--;
+                renderCategory();
+            }
+        }
+
+        // --- 結果計算と表示 ---
+        function calculateAndShowResult() {
+            switchScreen('screen-loading');
+            
+            // スコア計算
+            const axisScores = [];
+            let totalScore = 0;
+
+            diagnosisData.forEach((category, index) => {
+                let catScoreSum = 0;
+                category.questions.forEach(q => {
+                    catScoreSum += userAnswers[q.id];
+                });
+                const catAvg = Math.round(catScoreSum / category.questions.length);
+                axisScores.push({
+                    index: index,
+                    id: category.id,
+                    title: category.title,
+                    shortTitle: category.shortTitle,
+                    icon: category.icon,
+                    score: catAvg
+                });
+                totalScore += catAvg;
+            });
+
+            const finalScore = Math.round(totalScore / diagnosisData.length);
+            
+            const resultData = {
+                finalScore,
+                axisScores,
+                date: new Date().toISOString()
+            };
+
+            // 保存
+            localStorage.setItem('keiei_shindan_result', JSON.stringify(resultData));
+
+            // ローディング演出後に結果表示
+            setTimeout(() => {
+                renderResult(resultData);
+                switchScreen('screen-result');
+                animateScore(finalScore);
+            }, 2000);
+        }
+
+        function showResultScreen() {
+            const saved = localStorage.getItem('keiei_shindan_result');
+            if (saved) {
+                const data = JSON.parse(saved);
+                renderResult(data);
+                switchScreen('screen-result');
+                // アニメーションなしで即表示するか、アニメさせるか。今回はアニメさせる。
+                animateScore(data.finalScore);
+            }
+        }
+
+        function renderResult(data) {
+            const evalData = getScoreEvaluation(data.finalScore);
+
+            // ヘッダー周り
+            document.getElementById('result-header-border').style.borderTopColor = evalData.color;
+            const badge = document.getElementById('score-badge');
+            badge.innerText = `評価：${evalData.label}`;
+            badge.className = `inline-block px-6 py-2 rounded-full font-bold text-lg mb-4 text-white ${evalData.bg}`;
+            
+            const shortMsg = document.getElementById('score-short-msg');
+            shortMsg.innerText = evalData.text;
+            shortMsg.className = `text-lg font-bold ${evalData.textColor}`;
+
+            // メッセージ
+            document.getElementById('overall-message').innerText = evalData.msg;
+
+            // アクション
+            const actionList = document.getElementById('action-list');
+            actionList.innerHTML = '';
+            evalData.actions.forEach(act => {
+                actionList.innerHTML += `<li class="flex items-start"><svg class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0 ${evalData.textColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-brand-text font-medium">${act}</span></li>`;
+            });
+
+            // レーダーチャート
+            renderChart(data.axisScores, evalData.color);
+
+            // 軸別カード
+            const catContainer = document.getElementById('category-scores-container');
+            catContainer.innerHTML = '';
+            data.axisScores.forEach(axis => {
+                const axisEval = getScoreEvaluation(axis.score);
+                const categoryDef = diagnosisData.find(d => d.id === axis.id);
+                let commentText = "";
+                if(axis.score >= 80) commentText = categoryDef.comments.high;
+                else if(axis.score >= 40) commentText = categoryDef.comments.mid;
+                else commentText = categoryDef.comments.low;
+
+                catContainer.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm p-5 border-t-4 print-shadow-none" style="border-top-color: ${axisEval.color}">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-brand-main text-sm">${axis.icon} ${axis.title}</h4>
+                            <span class="font-bold text-xl" style="color: ${axisEval.color}">${axis.score}<span class="text-xs text-gray-400 ml-1">点</span></span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+                            <div class="h-1.5 rounded-full" style="width: ${axis.score}%; background-color: ${axisEval.color}"></div>
+                        </div>
+                        <p class="text-xs text-gray-600">${commentText}</p>
+                    </div>
+                `;
+            });
+
+            // 強みと課題
+            const sortedAxes = [...data.axisScores].sort((a, b) => b.score - a.score);
+            const strengths = sortedAxes.slice(0, 2);
+            const weaknesses = sortedAxes.slice(-2).reverse(); // ワーストから順に
+
+            const strCont = document.getElementById('strengths-container');
+            strCont.innerHTML = strengths.map(s => `
+                <div class="bg-green-50 rounded px-3 py-2 flex justify-between items-center border border-green-100">
+                    <span class="text-sm font-medium text-gray-800">${s.icon} ${s.title}</span>
+                    <span class="text-xs font-bold text-brand-safe">${s.score}点</span>
+                </div>
+            `).join('');
+
+            const weakCont = document.getElementById('weaknesses-container');
+            weakCont.innerHTML = weaknesses.map(w => `
+                <div class="bg-orange-50 rounded px-3 py-2 flex justify-between items-center border border-orange-100">
+                    <span class="text-sm font-medium text-gray-800">${w.icon} ${w.title}</span>
+                    <span class="text-xs font-bold text-brand-improve">${w.score}点</span>
+                </div>
+            `).join('');
+        }
+
+        // 円形ゲージアニメーション
+        function animateScore(targetScore) {
+            const circle = document.getElementById('score-circle');
+            const text = document.getElementById('score-text');
+            const evalData = getScoreEvaluation(targetScore);
+            
+            circle.style.stroke = evalData.color;
+            text.style.fill = evalData.color;
+
+            let currentScore = 0;
+            const duration = 1500; // ms
+            const interval = 20;
+            const steps = duration / interval;
+            const increment = targetScore / steps;
+
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(timer);
+                }
+                
+                // SVG stroke-dasharray (円周は約100)
+                circle.setAttribute('stroke-dasharray', `${currentScore}, 100`);
+                text.textContent = Math.round(currentScore);
+            }, interval);
+        }
+
+        // レーダーチャート描画
+        function renderChart(axisScores, mainColor) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+            const fontColor = isDark ? '#D1D5DB' : '#1A3A5C';
+            const avgColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(200, 200, 200, 0.1)';
+            const avgBorderColor = isDark ? '#6B7280' : '#D1D5DB';
+
+            const labels = axisScores.map(a => a.shortTitle);
+            const data = axisScores.map(a => a.score);
+
+            // hexからrgba変換 (背景塗りつぶし用)
+            const hexToRgb = hex => {
+                let r = 0, g = 0, b = 0;
+                if (hex.length == 4) {
+                    r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3];
+                } else if (hex.length == 7) {
+                    r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6];
+                }
+                return `${+r},${+g},${+b}`;
+            };
+            const bgColor = `rgba(${hexToRgb(mainColor)}, ${isDark ? '0.3' : '0.2'})`;
+
+            Chart.defaults.font.family = '"Noto Sans JP", sans-serif';
+            Chart.defaults.color = '#666';
+
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'あなたの会社',
+                            data: data,
+                            backgroundColor: bgColor,
+                            borderColor: mainColor,
+                            pointBackgroundColor: mainColor,
+                            pointBorderColor: isDark ? '#1F2937' : '#fff',
+                            pointHoverBackgroundColor: isDark ? '#1F2937' : '#fff',
+                            pointHoverBorderColor: mainColor,
+                            borderWidth: 2,
+                        },
+                        {
+                            label: '全国平均（目安）',
+                            data: [60, 60, 60, 60, 60],
+                            backgroundColor: avgColor,
+                            borderColor: avgBorderColor,
+                            pointBackgroundColor: avgBorderColor,
+                            pointBorderColor: isDark ? '#1F2937' : '#fff',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: gridColor },
+                            grid: { color: gridColor },
+                            pointLabels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: fontColor
+                            },
+                            ticks: {
+                                min: 0, max: 100, stepSize: 20,
+                                display: false // 数値ラベル非表示でスッキリ
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                boxWidth: 12, 
+                                font: { size: 11 },
+                                color: fontColor
+                            }
+                        },
+                        tooltip: {
+                            callbacks: { label: (context) => `${context.raw}点` }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- その他機能 ---
+        function sendToTaxAccountant() {
+            const saved = localStorage.getItem('keiei_shindan_result');
+            if(!saved) return;
+            const data = JSON.parse(saved);
+            
+            const subject = encodeURIComponent("経営健康診断の結果について（ご相談）");
+            let body = `税理士先生\n\nお世話になっております。\n「経営健康診断」を実施しましたので、結果を共有いたします。次回の面談時にアドバイスをいただけますと幸いです。\n\n`;
+            body += `【診断結果】\n`;
+            body += `総合スコア：${data.finalScore}点\n\n`;
+            body += `■ 軸別スコア\n`;
+            data.axisScores.forEach(a => {
+                body += `・${a.title}：${a.score}点\n`;
+            });
+            body += `\n※本メールはシステムから自動生成されています。`;
+            
+            window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+        }
+
+        function openProModal() {
+            document.getElementById('modal-pro').classList.remove('hidden-screen');
+        }
+
+        function closeProModal() {
+            document.getElementById('modal-pro').classList.add('hidden-screen');
+        }
+
+        // --- モーダル・設定・データ管理 ---
+        function openHelpModal() {
+            document.getElementById('modal-help').classList.remove('hidden-screen');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('modal-help').classList.add('hidden-screen');
+        }
+
+        function openSettingsModal() {
+            document.getElementById('modal-settings').classList.remove('hidden-screen');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('modal-settings').classList.add('hidden-screen');
+        }
+
+        function setTheme(theme, updateChart = true) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('keiei_shindan_theme', theme);
+            
+            // チャートが表示中なら再描画
+            if (updateChart && chartInstance && !document.getElementById('screen-result').classList.contains('hidden-screen')) {
+                const saved = localStorage.getItem('keiei_shindan_result');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    const evalData = getScoreEvaluation(data.finalScore);
+                    renderChart(data.axisScores, evalData.color);
+                }
+            }
+        }
+
+        function loadDemoData() {
+            userAnswers = {
+                "q1_1": 100, "q1_2": 60, "q1_3": 50,
+                "q2_1": 70, "q2_2": 100, "q2_3": 50,
+                "q3_1": 70, "q3_2": 50, "q3_3": 50,
+                "q4_1": 50, "q4_2": 50, "q4_3": 0,
+                "q5_1": 50, "q5_2": 70, "q5_3": 50
+            };
+            closeSettingsModal();
+            calculateAndShowResult();
+        }
+
+        function clearAllData() {
+            if(confirm('すべてのデータ（診断結果）をクリアしますか？')) {
+                localStorage.removeItem('keiei_shindan_result');
+                userAnswers = {};
+                closeSettingsModal();
+                switchScreen('screen-start');
+                document.getElementById('previous-result-area').classList.add('hidden-screen');
+            }
+        }
+
+    </script>
+</body>
+</html>
