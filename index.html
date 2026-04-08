@@ -195,6 +195,74 @@
                     </div>
                 </div>
 
+                <!-- 業種・規模選択エリア -->
+                <div class="bg-brand-bg rounded-xl p-5 mb-6 text-left border border-gray-200">
+                    <p class="text-xs font-semibold text-brand-accent mb-3 tracking-wider">📋 より精度の高い診断のために教えてください</p>
+
+                    <!-- 業種選択 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-brand-main mb-2">業種を選んでください</label>
+                        <div class="grid grid-cols-2 gap-2" id="industry-selector">
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="飲食業" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🍜 飲食業</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="製造業" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🔧 製造業</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="建設業" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🏗️ 建設業</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="小売業" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🛍️ 小売業</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="美容業" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">✂️ 美容業</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="医療・福祉" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🏥 医療・福祉</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="士業・コンサル" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">⚖️ 士業・コンサル</div>
+                            </label>
+                            <label class="industry-btn cursor-pointer">
+                                <input type="radio" name="industry" value="その他" class="sr-only peer">
+                                <div class="text-center py-2 px-1 border-2 border-gray-200 rounded-lg text-sm peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">🏢 その他</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 従業員規模 -->
+                    <div>
+                        <label class="block text-sm font-bold text-brand-main mb-2">従業員数（本人含む）</label>
+                        <div class="grid grid-cols-4 gap-2" id="scale-selector">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scale" value="1〜3名" class="sr-only peer">
+                                <div class="text-center py-2 border-2 border-gray-200 rounded-lg text-xs peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">1〜3名</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scale" value="4〜10名" class="sr-only peer">
+                                <div class="text-center py-2 border-2 border-gray-200 rounded-lg text-xs peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">4〜10名</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scale" value="11〜30名" class="sr-only peer">
+                                <div class="text-center py-2 border-2 border-gray-200 rounded-lg text-xs peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">11〜30名</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="scale" value="31名以上" class="sr-only peer">
+                                <div class="text-center py-2 border-2 border-gray-200 rounded-lg text-xs peer-checked:border-brand-accent peer-checked:bg-teal-50 dark:peer-checked:bg-teal-900 transition-all text-gray-700 dark:text-gray-300 hover:border-brand-accent">31名〜</div>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3">※ 選択しなくてもスタートできます。選ぶと同業種との比較が表示されます。</p>
+                </div>
+
                 <button onclick="startDiagnosis()" class="w-full md:w-auto px-12 py-4 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105">
                     診断をスタートする
                 </button>
@@ -283,6 +351,12 @@
                 <p class="text-lg font-bold" id="score-short-msg">---</p>
             </div>
 
+            <!-- 業種タグ表示 -->
+            <div id="industry-tag-area" class="text-center mb-4 hidden-screen">
+                <span class="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-brand-main text-white mr-2" id="industry-tag-label"></span>
+                <span class="inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-brand-bg text-brand-main border border-brand-accent" id="scale-tag-label"></span>
+            </div>
+
             <!-- メッセージカード -->
             <div class="bg-brand-bg rounded-2xl p-6 mb-8 border border-gray-200 print-shadow-none">
                 <div class="flex items-start">
@@ -304,7 +378,7 @@
                         <canvas id="radarChart"></canvas>
                     </div>
                     <div class="mt-4 text-xs text-gray-500 text-center w-full">
-                        ※薄いグレーの線は一般的な中小企業の平均目安(60点)です。
+                        <span id="chart-legend-note">※破線は一般的な中小企業の平均目安です。業種を選ぶと同業種平均が表示されます。</span>
                     </div>
                 </div>
 
@@ -427,32 +501,40 @@
             <div class="p-6">
                 <p class="text-sm font-semibold text-brand-accent mb-4">この機能はPro版（有料プラン）でご利用いただけます。</p>
                 
+                <!-- PRO版特典リスト -->
                 <ul class="space-y-3 mb-6 text-sm text-gray-700">
                     <li class="flex items-start">
                         <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Claude AIによる「あなた専用の経営改善レポート」自動生成
+                        <span><strong>AIが業種・規模に合わせた</strong>「あなた専用の経営改善レポート」を自動生成</span>
                     </li>
                     <li class="flex items-start">
                         <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        同業種・同規模の平均との高度な比較分析
+                        <span>今後3ヶ月の<strong>具体的アクションプラン</strong>をAIが提示（税理士面談資料として活用可）</span>
                     </li>
                     <li class="flex items-start">
                         <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        月次診断の履歴保存とスコア推移グラフ表示
+                        <span><strong>月次診断の履歴保存</strong>とスコア推移グラフ表示（経営改善の見える化）</span>
                     </li>
                     <li class="flex items-start">
                         <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        顧問先別スコア管理（税理士事務所向け管理画面）
+                        <span>AI生成レポートの<strong>PDF出力</strong>（税理士・金融機関への報告書として使用可）</span>
                     </li>
                 </ul>
 
+                <!-- 料金表示 -->
+                <div class="bg-gradient-to-r from-brand-main to-teal-700 text-white p-4 rounded-xl mb-6 text-center">
+                    <p class="text-xs mb-1 opacity-80">月額プラン</p>
+                    <p class="text-3xl font-bold">¥2,980 <span class="text-base font-normal">/ 月</span></p>
+                    <p class="text-xs mt-1 opacity-80">最初の3回は無料でお試しいただけます</p>
+                </div>
+
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 text-sm text-center">
-                    税理士事務所様向けのライセンスプランをご用意しております。<br>
+                    税理士事務所様向けのライセンスプランもご用意しております。<br>
                     顧問先への付加価値提供ツールとしてご活用ください。
                 </div>
 
                 <div class="flex flex-col space-y-3">
-                    <a href="mailto:info@example.com?subject=経営健康診断Pro版に関するお問い合わせ" class="w-full py-3 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-lg shadow text-center transition-colors">
+                    <a href="/cdn-cgi/l/email-protection#3d54535b527d58455c504d5158135e5250024e485f57585e4900da88b1d8ab8bd8bc98d8878ad59587dbab906d4f52dab4b5debc96d4ab9fdebca4debfb6debcb7d8a8b2debcb9d8adb5debfb2debca6" class="w-full py-3 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-lg shadow text-center transition-colors">
                         詳細を問い合わせる（メール）
                     </a>
                     <button onclick="closeProModal()" class="w-full py-3 bg-white border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-colors">
@@ -563,7 +645,7 @@
     </div>
 
     <!-- JavaScript ロジック -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // --- データ定義 ---
         const diagnosisData = [
             {
@@ -652,6 +734,20 @@
         let currentCategoryIndex = 0;
         let userAnswers = {}; // { q1_1: 100, ... }
         let chartInstance = null;
+        let userProfile = { industry: '', scale: '' };
+
+        // --- 業種別ベンチマークデータ（5軸: 収益力,安全性,効率性,人材,将来性） ---
+        const industryBenchmark = {
+            '飲食業':       [48, 42, 45, 40, 50],
+            '製造業':       [55, 58, 60, 52, 55],
+            '建設業':       [52, 50, 48, 45, 48],
+            '小売業':       [46, 45, 50, 42, 44],
+            '美容業':       [50, 45, 48, 48, 52],
+            '医療・福祉':   [58, 55, 52, 60, 56],
+            '士業・コンサル': [62, 60, 58, 55, 60],
+            'その他':       [52, 50, 50, 48, 50],
+        };
+        const defaultBenchmark = [55, 55, 55, 55, 55];
 
         // --- スコア評価ロジック ---
         function getScoreEvaluation(score) {
@@ -716,6 +812,12 @@
         }
 
         function startDiagnosis() {
+            // 業種・規模を取得して保存
+            const industryEl = document.querySelector('input[name="industry"]:checked');
+            const scaleEl = document.querySelector('input[name="scale"]:checked');
+            userProfile.industry = industryEl ? industryEl.value : '';
+            userProfile.scale = scaleEl ? scaleEl.value : '';
+
             currentCategoryIndex = 0;
             userAnswers = {};
             renderCategory();
@@ -866,6 +968,8 @@
             const resultData = {
                 finalScore,
                 axisScores,
+                industry: userProfile.industry,
+                scale: userProfile.scale,
                 date: new Date().toISOString()
             };
 
@@ -894,6 +998,20 @@
         function renderResult(data) {
             const evalData = getScoreEvaluation(data.finalScore);
 
+            // 業種タグ表示
+            const industryTagArea = document.getElementById('industry-tag-area');
+            if (data.industry || data.scale) {
+                industryTagArea.classList.remove('hidden-screen');
+                const indLabel = document.getElementById('industry-tag-label');
+                const scaleLabel = document.getElementById('scale-tag-label');
+                indLabel.textContent = data.industry ? '🏢 ' + data.industry : '';
+                indLabel.style.display = data.industry ? '' : 'none';
+                scaleLabel.textContent = data.scale ? '👥 ' + data.scale : '';
+                scaleLabel.style.display = data.scale ? '' : 'none';
+            } else {
+                industryTagArea.classList.add('hidden-screen');
+            }
+
             // ヘッダー周り
             document.getElementById('result-header-border').style.borderTopColor = evalData.color;
             const badge = document.getElementById('score-badge');
@@ -904,8 +1022,12 @@
             shortMsg.innerText = evalData.text;
             shortMsg.className = `text-lg font-bold ${evalData.textColor}`;
 
-            // メッセージ
-            document.getElementById('overall-message').innerText = evalData.msg;
+            // メッセージ（業種名を含める）
+            let msgText = evalData.msg;
+            if (data.industry) {
+                msgText = data.industry + 'の経営者として、' + msgText;
+            }
+            document.getElementById('overall-message').innerText = msgText;
 
             // アクション
             const actionList = document.getElementById('action-list');
@@ -914,8 +1036,9 @@
                 actionList.innerHTML += `<li class="flex items-start"><svg class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0 ${evalData.textColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span class="text-brand-text font-medium">${act}</span></li>`;
             });
 
-            // レーダーチャート
-            renderChart(data.axisScores, evalData.color);
+            // レーダーチャート（業種ベンチマーク付き）
+            const benchmark = data.industry ? (industryBenchmark[data.industry] || defaultBenchmark) : defaultBenchmark;
+            renderChart(data.axisScores, evalData.color, benchmark, data.industry);
 
             // 軸別カード
             const catContainer = document.getElementById('category-scores-container');
@@ -993,7 +1116,7 @@
         }
 
         // レーダーチャート描画
-        function renderChart(axisScores, mainColor) {
+        function renderChart(axisScores, mainColor, benchmarkData, industryName) {
             const ctx = document.getElementById('radarChart').getContext('2d');
             
             if (chartInstance) {
@@ -1005,6 +1128,8 @@
             const fontColor = isDark ? '#D1D5DB' : '#1A3A5C';
             const avgColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(200, 200, 200, 0.1)';
             const avgBorderColor = isDark ? '#6B7280' : '#D1D5DB';
+            const industryColor = '#F5A623';
+            const industryBgColor = isDark ? 'rgba(245,166,35,0.15)' : 'rgba(245,166,35,0.1)';
 
             const labels = axisScores.map(a => a.shortTitle);
             const data = axisScores.map(a => a.score);
@@ -1024,33 +1149,51 @@
             Chart.defaults.font.family = '"Noto Sans JP", sans-serif';
             Chart.defaults.color = '#666';
 
+            // データセット構築
+            const datasets = [
+                {
+                    label: 'あなたの会社',
+                    data: data,
+                    backgroundColor: bgColor,
+                    borderColor: mainColor,
+                    pointBackgroundColor: mainColor,
+                    pointBorderColor: isDark ? '#1F2937' : '#fff',
+                    pointHoverBackgroundColor: isDark ? '#1F2937' : '#fff',
+                    pointHoverBorderColor: mainColor,
+                    borderWidth: 2,
+                }
+            ];
+
+            // 業種ベンチマークがある場合は追加（全国平均の代わりに）
+            if (benchmarkData && industryName) {
+                datasets.push({
+                    label: industryName + '平均（目安）',
+                    data: benchmarkData,
+                    backgroundColor: industryBgColor,
+                    borderColor: industryColor,
+                    pointBackgroundColor: industryColor,
+                    pointBorderColor: isDark ? '#1F2937' : '#fff',
+                    borderWidth: 1.5,
+                    borderDash: [4, 4]
+                });
+            } else {
+                datasets.push({
+                    label: '全国平均（目安）',
+                    data: [60, 60, 60, 60, 60],
+                    backgroundColor: avgColor,
+                    borderColor: avgBorderColor,
+                    pointBackgroundColor: avgBorderColor,
+                    pointBorderColor: isDark ? '#1F2937' : '#fff',
+                    borderWidth: 1,
+                    borderDash: [5, 5]
+                });
+            }
+
             chartInstance = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'あなたの会社',
-                            data: data,
-                            backgroundColor: bgColor,
-                            borderColor: mainColor,
-                            pointBackgroundColor: mainColor,
-                            pointBorderColor: isDark ? '#1F2937' : '#fff',
-                            pointHoverBackgroundColor: isDark ? '#1F2937' : '#fff',
-                            pointHoverBorderColor: mainColor,
-                            borderWidth: 2,
-                        },
-                        {
-                            label: '全国平均（目安）',
-                            data: [60, 60, 60, 60, 60],
-                            backgroundColor: avgColor,
-                            borderColor: avgBorderColor,
-                            pointBackgroundColor: avgBorderColor,
-                            pointBorderColor: isDark ? '#1F2937' : '#fff',
-                            borderWidth: 1,
-                            borderDash: [5, 5]
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -1094,7 +1237,10 @@
             
             const subject = encodeURIComponent("経営健康診断の結果について（ご相談）");
             let body = `税理士先生\n\nお世話になっております。\n「経営健康診断」を実施しましたので、結果を共有いたします。次回の面談時にアドバイスをいただけますと幸いです。\n\n`;
-            body += `【診断結果】\n`;
+            body += `【基本情報】\n`;
+            if (data.industry) body += `業種：${data.industry}\n`;
+            if (data.scale) body += `従業員数：${data.scale}\n`;
+            body += `\n【診断結果】\n`;
             body += `総合スコア：${data.finalScore}点\n\n`;
             body += `■ 軸別スコア\n`;
             data.axisScores.forEach(a => {
@@ -1144,7 +1290,8 @@
                 if (saved) {
                     const data = JSON.parse(saved);
                     const evalData = getScoreEvaluation(data.finalScore);
-                    renderChart(data.axisScores, evalData.color);
+                    const bm = data.industry ? (industryBenchmark[data.industry] || defaultBenchmark) : defaultBenchmark;
+                    renderChart(data.axisScores, evalData.color, bm, data.industry);
                 }
             }
         }
@@ -1165,12 +1312,4 @@
             if(confirm('すべてのデータ（診断結果）をクリアしますか？')) {
                 localStorage.removeItem('keiei_shindan_result');
                 userAnswers = {};
-                closeSettingsModal();
-                switchScreen('screen-start');
-                document.getElementById('previous-result-area').classList.add('hidden-screen');
-            }
-        }
-
-    </script>
-</body>
-</html>
+                closeSet
