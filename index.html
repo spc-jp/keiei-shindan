@@ -426,32 +426,37 @@
                 </ul>
             </div>
 
-            <!-- ================= Pro版案内ゾーン ================= -->
-            <div class="relative bg-white rounded-2xl shadow-md overflow-hidden mb-8 no-print border border-gray-100">
-                <!-- 背景ぼかしUI -->
-                <div class="p-6 blur-ui bg-gray-50">
-                    <div class="h-4 bg-gray-200 rounded w-1/3 mb-6"></div>
-                    <div class="h-32 bg-gray-200 rounded-lg mb-4"></div>
-                    <div class="space-y-2">
-                        <div class="h-3 bg-gray-200 rounded w-full"></div>
-                        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
-                        <div class="h-3 bg-gray-200 rounded w-4/6"></div>
+            <!-- ================= AI分析エリア ================= -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden mb-8 no-print border border-gray-100">
+                <!-- ヘッダー -->
+                <div class="bg-gradient-to-r from-brand-main to-teal-700 px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">🤖</span>
+                        <div>
+                            <h3 class="text-white font-bold text-base">AI経営アドバイザー</h3>
+                            <p class="text-teal-200 text-xs">Claude AIがあなたの会社を個別分析します</p>
+                        </div>
                     </div>
+                    <span class="text-xs font-bold bg-white text-brand-main px-3 py-1 rounded-full shadow" id="trial-badge">無料3回</span>
                 </div>
-                
-                <!-- オーバーレイ内容 -->
-                <div class="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-80 p-6 text-center">
-                    <div class="bg-gradient-to-r from-brand-main to-brand-accent text-white text-xs font-bold px-3 py-1 rounded-full mb-3 shadow">
-                        Pro Version
-                    </div>
-                    <h3 class="text-xl font-bold text-brand-main mb-2">AIがあなたの会社を詳しく分析します</h3>
-                    <p class="text-sm text-gray-600 mb-6 max-w-md">
-                        AIによる具体的な改善レポート生成、同業他社との比較、過去からのスコア推移グラフなど、経営改善をさらに加速させる機能を利用できます。
-                    </p>
-                    <button onclick="openProModal()" class="px-8 py-3 bg-brand-main hover:bg-gray-800 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Pro版の詳細を見る
+                <!-- ボタン -->
+                <div class="px-6 pt-5 pb-4">
+                    <button
+                        id="btn-ai-advice"
+                        onclick="callAiAdvice()"
+                        class="w-full py-4 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-xl shadow-md transition-transform transform hover:scale-[1.02] flex items-center justify-center gap-2 text-base">
+                        🤖 AIアドバイスを見る（無料あと3回）
                     </button>
+                    <p class="text-xs text-gray-400 text-center mt-2">業種・規模・5軸スコアを元にAIが個別分析します</p>
+                </div>
+                <!-- AI結果エリア -->
+                <div id="ai-advice-area" class="hidden-screen px-6 pb-6">
+                    <div id="ai-advice-loading" class="flex flex-col items-center justify-center py-10">
+                        <div class="pulse-loader mb-4"></div>
+                        <p class="text-sm text-gray-500">AIが経営状態を分析中...</p>
+                        <p class="text-xs text-gray-400 mt-1">業種・規模・スコアを総合的に判断しています</p>
+                    </div>
+                    <div id="ai-advice-result" class="hidden-screen"></div>
                 </div>
             </div>
 
@@ -1312,4 +1317,137 @@
             if(confirm('すべてのデータ（診断結果）をクリアしますか？')) {
                 localStorage.removeItem('keiei_shindan_result');
                 userAnswers = {};
-                closeSet
+                closeSettingsModal();
+                switchScreen('screen-start');
+                document.getElementById('previous-result-area').classList.add('hidden-screen');
+            }
+        }
+
+        // ============================================================
+        // PRO版 AI分析機能
+        // ============================================================
+        const WORKER_URL = 'https://keiei-shindan-ai.yymmatsu.workers.dev';
+        const TRIAL_KEY  = 'keiei_shindan_pro_trial';
+        const MAX_TRIAL  = 3;
+
+        function getTrialCount() {
+            return parseInt(localStorage.getItem(TRIAL_KEY) || '0', 10);
+        }
+
+        function updateTrialBadge() {
+            const used   = getTrialCount();
+            const remain = MAX_TRIAL - used;
+            const badge  = document.getElementById('trial-badge');
+            const btn    = document.getElementById('btn-ai-advice');
+            if (!badge || !btn) return;
+            if (remain > 0) {
+                badge.textContent = `無料あと${remain}回`;
+                btn.textContent   = `🤖 AIアドバイスを見る（無料あと${remain}回）`;
+                btn.disabled      = false;
+            } else {
+                badge.textContent     = 'PRO版に登録';
+                badge.classList.add('bg-brand-accent', 'text-white');
+                badge.classList.remove('bg-white', 'text-brand-main');
+                btn.textContent = '🔒 PRO版でAI分析を続ける';
+            }
+        }
+
+        async function callAiAdvice() {
+            const saved = localStorage.getItem('keiei_shindan_result');
+            if (!saved) return;
+            const data = JSON.parse(saved);
+            const used = getTrialCount();
+
+            if (used >= MAX_TRIAL) {
+                openProModal();
+                return;
+            }
+
+            const btn  = document.getElementById('btn-ai-advice');
+            const area = document.getElementById('ai-advice-area');
+            btn.disabled    = true;
+            btn.textContent = '✨ AIが分析中...';
+            area.classList.remove('hidden-screen');
+            document.getElementById('ai-advice-loading').classList.remove('hidden-screen');
+            document.getElementById('ai-advice-result').classList.add('hidden-screen');
+
+            try {
+                const res = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        industry:   data.industry   || '',
+                        scale:      data.scale      || '',
+                        finalScore: data.finalScore,
+                        axisScores: data.axisScores,
+                    }),
+                });
+                const json = await res.json();
+                if (!json.ok) throw new Error(json.error || '取得に失敗しました');
+
+                localStorage.setItem(TRIAL_KEY, String(used + 1));
+                renderAiAdvice(json.result, data);
+                updateTrialBadge();
+
+            } catch (e) {
+                document.getElementById('ai-advice-loading').classList.add('hidden-screen');
+                document.getElementById('ai-advice-result').innerHTML =
+                    `<p class="text-red-500 text-sm p-4">エラーが発生しました：${e.message}<br>しばらく待ってから再度お試しください。</p>`;
+                document.getElementById('ai-advice-result').classList.remove('hidden-screen');
+                btn.disabled    = false;
+                btn.textContent = '🤖 AIアドバイスを再試行する';
+            }
+        }
+
+        function renderAiAdvice(result, data) {
+            document.getElementById('ai-advice-loading').classList.add('hidden-screen');
+            const resultEl = document.getElementById('ai-advice-result');
+
+            const priorityColors  = ['#E05C5C', '#F5A623', '#2EB8A0'];
+            const priorityLabels  = ['最優先', '重要', '中長期'];
+
+            const actionsHTML = result.actions.map((act, i) => `
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-white border border-gray-100 shadow-sm mb-2">
+                    <span class="flex-shrink-0 text-xs font-bold text-white px-2 py-1 rounded-full mt-0.5"
+                          style="background-color:${priorityColors[i] || '#888'}">
+                        ${priorityLabels[i] || act.priority}
+                    </span>
+                    <div>
+                        <p class="text-sm font-bold text-brand-main">${act.title}</p>
+                        <p class="text-xs text-gray-600 mt-1">${act.detail}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            const indTag   = data.industry ? `<span class="text-xs text-brand-accent font-semibold mr-2">🏢 ${data.industry}</span>` : '';
+            const scaleTag = data.scale    ? `<span class="text-xs text-gray-500">👥 ${data.scale}</span>` : '';
+
+            resultEl.innerHTML = `
+                <div class="mb-4">${indTag}${scaleTag}</div>
+                <div class="bg-gradient-to-r from-brand-main to-teal-700 text-white rounded-xl p-4 mb-4">
+                    <p class="text-xs opacity-80 mb-1">AI診断キャッチコピー</p>
+                    <p class="text-lg font-bold">${result.headline}</p>
+                </div>
+                <div class="bg-brand-bg rounded-xl p-4 mb-5 border border-gray-200">
+                    <p class="text-sm leading-relaxed text-brand-text">${result.summary}</p>
+                </div>
+                <h4 class="text-sm font-bold text-brand-main mb-3">🎯 AIが提案する3つのアクション</h4>
+                ${actionsHTML}
+                <div class="mt-4 grid grid-cols-2 gap-3 text-xs text-center">
+                    <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                        <p class="text-gray-500 mb-1">✅ 最も強い分野</p>
+                        <p class="font-bold text-brand-safe">${result.strong_axis || '-'}</p>
+                    </div>
+                    <div class="bg-orange-50 rounded-lg p-3 border border-orange-100">
+                        <p class="text-gray-500 mb-1">⚠️ 最優先で強化する分野</p>
+                        <p class="font-bold text-brand-improve">${result.weak_axis || '-'}</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-right">※AIによる自動生成です。詳細は専門家にご相談ください。</p>
+            `;
+            resultEl.classList.remove('hidden-screen');
+        }
+
+    </script>
+</body>
+</html>
