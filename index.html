@@ -1466,9 +1466,13 @@
 
             btn.disabled    = true;
             btn.textContent = '✨ AIが分析中...';
-            area.style.display = 'block';
-            document.getElementById('ai-advice-loading').style.display = 'flex';
-            document.getElementById('ai-advice-result').style.display  = 'none';
+            area.classList.remove('hidden-screen');
+            area.style.setProperty('display', 'block', 'important');
+            const loadingEl = document.getElementById('ai-advice-loading');
+            loadingEl.classList.remove('hidden-screen');
+            loadingEl.style.setProperty('display', 'flex', 'important');
+            const resultElPre = document.getElementById('ai-advice-result');
+            resultElPre.style.setProperty('display', 'none', 'important');
 
             try {
                 const res = await fetch(WORKER_URL, {
@@ -1499,7 +1503,7 @@
                 updateTrialBadge();
 
             } catch (e) {
-                document.getElementById('ai-advice-loading').style.display = 'none';
+                document.getElementById('ai-advice-loading').style.setProperty('display', 'none', 'important');
                 const errMsg = e.message || '不明なエラー';
                 document.getElementById('ai-advice-result').innerHTML = `
                     <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -1507,14 +1511,17 @@
                         <p class="text-red-500 text-xs">${errMsg}</p>
                         <p class="text-gray-500 text-xs mt-2">しばらく待ってから再度お試しください。</p>
                     </div>`;
-                document.getElementById('ai-advice-result').style.display = 'block';
+                const errResultEl = document.getElementById('ai-advice-result');
+                errResultEl.classList.remove('hidden-screen');
+                errResultEl.style.setProperty('display', 'block', 'important');
                 btn.disabled    = false;
                 btn.textContent = '🔄 AIアドバイスを再試行する';
             }
         }
 
         function renderAiAdvice(result, data) {
-            document.getElementById('ai-advice-loading').style.display = 'none';
+            const loadingEl2 = document.getElementById('ai-advice-loading');
+            loadingEl2.style.setProperty('display', 'none', 'important');
             const resultEl = document.getElementById('ai-advice-result');
 
             const priorityColors  = ['#E05C5C', '#F5A623', '#2EB8A0'];
@@ -1559,7 +1566,8 @@
                 </div>
                 <p class="text-xs text-gray-400 mt-4 text-right">※AIによる自動生成です。詳細は専門家にご相談ください。</p>
             `;
-            resultEl.style.display = 'block';
+            resultEl.classList.remove('hidden-screen');
+            resultEl.style.setProperty('display', 'block', 'important');
         }
 
     </script>
