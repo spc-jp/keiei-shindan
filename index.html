@@ -861,10 +861,9 @@
             const progressPercent = ((currentCategoryIndex) / 5) * 100;
             document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
-            // タイトル
-            document.getElementById('category-badge').innerText = `軸 ${currentCategoryIndex + 1}`;
+            // タイトル（category-badgeはcategory-titleの子要素のためinnerHTMLで一括更新）
             document.getElementById('category-title').innerHTML = `
-                <span class="bg-brand-main text-white text-sm py-1 px-3 rounded-full mr-3">軸 ${currentCategoryIndex + 1}</span>
+                <span id="category-badge" class="bg-brand-main text-white text-sm py-1 px-3 rounded-full mr-3">軸 ${currentCategoryIndex + 1}</span>
                 ${category.icon} ${category.title}
             `;
 
