@@ -655,13 +655,21 @@
                 </div>
                 
                 <div class="border-t border-gray-200 pt-4 mt-4 dark-border-gray">
-                    <div class="flex justify-between items-center text-xs text-gray-400">
+                    <div class="flex justify-between items-center text-xs text-gray-400 mb-3">
                         <button onclick="loadDemoData()" class="hover:text-brand-accent hover:underline transition-colors">
                             デモデータを読み込む
                         </button>
                         <button onclick="clearAllData()" class="hover:text-brand-warning hover:underline transition-colors">
                             すべてのデータをクリア
                         </button>
+                    </div>
+                    <div class="border-t border-gray-100 pt-3 dark-border-gray">
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <span id="trial-count-label">AIアドバイス残り：確認中</span>
+                            <button onclick="resetTrialCount()" class="hover:text-brand-accent hover:underline transition-colors">
+                                AIトライアルをリセット
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1293,6 +1301,7 @@
 
         function openSettingsModal() {
             document.getElementById('modal-settings').classList.remove('hidden-screen');
+            updateTrialCountLabel();
         }
 
         function closeSettingsModal() {
@@ -1332,8 +1341,9 @@
         }
 
         function clearAllData() {
-            if(confirm('すべてのデータ（診断結果）をクリアしますか？')) {
+            if(confirm('すべてのデータ（診断結果）とAIトライアル回数をクリアしますか？')) {
                 localStorage.removeItem('keiei_shindan_result');
+                localStorage.removeItem('keiei_shindan_pro_trial');
                 userAnswers = {};
                 closeSettingsModal();
                 switchScreen('screen-start');
@@ -1344,6 +1354,30 @@
         // ============================================================
         // PRO版 AI分析機能
         // ============================================================
+        // トライアルリセット（開発・テスト用 / 設定モーダルから呼び出し）
+        function resetTrialCount() {
+            if(confirm('AIアドバイスのトライアル回数をリセットしますか？\n（無料3回が復活します）')) {
+                localStorage.removeItem('keiei_shindan_pro_trial');
+                updateTrialBadge();
+                updateTrialCountLabel();
+                alert('リセットしました。AIアドバイスを再度ご利用いただけます。');
+            }
+        }
+
+        function updateTrialCountLabel() {
+            const label = document.getElementById('trial-count-label');
+            if (!label) return;
+            const used   = getTrialCount();
+            const remain = MAX_TRIAL - used;
+            if (remain > 0) {
+                label.textContent = `AIアドバイス残り：あと${remain}回（無料）`;
+                label.className = 'text-xs text-brand-accent font-semibold';
+            } else {
+                label.textContent = 'AIアドバイス：無料トライアル終了';
+                label.className = 'text-xs text-brand-warning font-semibold';
+            }
+        }
+
         const WORKER_URL = 'https://keiei-shindan-ai.yymmatsu.workers.dev';
         const TRIAL_KEY  = 'keiei_shindan_pro_trial';
         const MAX_TRIAL  = 3;
