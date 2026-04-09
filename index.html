@@ -1385,9 +1385,10 @@
             const area = document.getElementById('ai-advice-area');
             btn.disabled    = true;
             btn.textContent = '✨ AIが分析中...';
-            area.classList.remove('hidden-screen');
-            document.getElementById('ai-advice-loading').classList.remove('hidden-screen');
-            document.getElementById('ai-advice-result').classList.add('hidden-screen');
+            // インラインスタイルで表示（hidden-screenの!importantに勝つため）
+            area.style.display = 'block';
+            document.getElementById('ai-advice-loading').style.display = 'flex';
+            document.getElementById('ai-advice-result').style.display  = 'none';
 
             try {
                 const res = await fetch(WORKER_URL, {
@@ -1408,17 +1409,17 @@
                 updateTrialBadge();
 
             } catch (e) {
-                document.getElementById('ai-advice-loading').classList.add('hidden-screen');
+                document.getElementById('ai-advice-loading').style.display = 'none';
                 document.getElementById('ai-advice-result').innerHTML =
                     `<p class="text-red-500 text-sm p-4">エラーが発生しました：${e.message}<br>しばらく待ってから再度お試しください。</p>`;
-                document.getElementById('ai-advice-result').classList.remove('hidden-screen');
+                document.getElementById('ai-advice-result').style.display = 'block';
                 btn.disabled    = false;
                 btn.textContent = '🤖 AIアドバイスを再試行する';
             }
         }
 
         function renderAiAdvice(result, data) {
-            document.getElementById('ai-advice-loading').classList.add('hidden-screen');
+            document.getElementById('ai-advice-loading').style.display = 'none';
             const resultEl = document.getElementById('ai-advice-result');
 
             const priorityColors  = ['#E05C5C', '#F5A623', '#2EB8A0'];
@@ -1463,7 +1464,7 @@
                 </div>
                 <p class="text-xs text-gray-400 mt-4 text-right">※AIによる自動生成です。詳細は専門家にご相談ください。</p>
             `;
-            resultEl.classList.remove('hidden-screen');
+            resultEl.style.display = 'block';
         }
 
     </script>
