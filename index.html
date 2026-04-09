@@ -168,12 +168,12 @@
 <body class="min-h-screen flex flex-col items-center">
 
     <!-- ヘッダー -->
-    <header class="w-full bg-brand-main text-white py-4 shadow-md z-10 transition-colors">
+    <header class="w-full bg-brand-main text-white py-4 shadow-md z-40 transition-colors fixed top-0 left-0 right-0">
         <div class="max-w-3xl mx-auto px-4 flex justify-between items-center">
-            <div>
+            <button onclick="goToStart()" class="text-left hover:opacity-80 transition-opacity">
                 <p class="text-xs text-brand-accent font-semibold tracking-wider mb-1">5分でわかる、あなたの会社の今</p>
-                <h1 class="text-lg md:text-xl font-bold">経営健康診断</h1>
-            </div>
+                <h1 class="text-lg md:text-xl font-bold">経営健康診断「経営みっけ」</h1>
+            </button>
             <div class="flex space-x-4">
                 <button onclick="openHelpModal()" class="flex flex-col items-center justify-center text-gray-300 hover:text-white transition-colors" title="使い方">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -188,7 +188,7 @@
     </header>
 
     <!-- メインコンテナ -->
-    <main id="app-container" class="w-full max-w-3xl flex-grow px-4 py-8 pb-24">
+    <main id="app-container" class="w-full max-w-3xl flex-grow px-4 py-8 pb-24 pt-24">
         
         <!-- ================= スタート画面 ================= -->
         <section id="screen-start" class="w-full max-w-2xl mx-auto">
@@ -522,11 +522,27 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-6">
-                <p class="text-sm font-semibold text-brand-accent mb-4">この機能はPro版（有料プラン）でご利用いただけます。</p>
-                
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
+
+                <!-- パスワード解除エリア -->
+                <div class="bg-brand-bg rounded-xl p-5 mb-5 border border-brand-accent">
+                    <p class="text-sm font-bold text-brand-main mb-1">🔑 ご購入済みの方はこちら</p>
+                    <p class="text-xs text-gray-500 mb-3">ご購入後にお届けするパスワードを入力してください</p>
+                    <div class="flex gap-2">
+                        <input type="password" id="pro-password-input" placeholder="パスワードを入力"
+                            class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-accent"
+                            onkeydown="if(event.key==='Enter') checkProPassword()">
+                        <button onclick="checkProPassword()"
+                            class="px-4 py-2 bg-brand-accent text-white font-bold rounded-lg text-sm hover:bg-teal-500 transition-colors">
+                            解除
+                        </button>
+                    </div>
+                    <p id="pro-password-error" class="text-xs text-red-500 mt-2 hidden-screen">パスワードが違います。もう一度お試しください。</p>
+                </div>
+
                 <!-- PRO版特典リスト -->
-                <ul class="space-y-3 mb-6 text-sm text-gray-700">
+                <p class="text-xs font-bold text-gray-500 mb-3 tracking-wider">Pro版でできること</p>
+                <ul class="space-y-3 mb-5 text-sm text-gray-700">
                     <li class="flex items-start">
                         <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span><strong>AIが業種・規模に合わせた</strong>「あなた専用の経営改善レポート」を自動生成</span>
@@ -545,26 +561,18 @@
                     </li>
                 </ul>
 
-                <!-- 料金表示 -->
-                <div class="bg-gradient-to-r from-brand-main to-teal-700 text-white p-4 rounded-xl mb-6 text-center">
-                    <p class="text-xs mb-1 opacity-80">月額プラン</p>
-                    <p class="text-3xl font-bold">¥2,980 <span class="text-base font-normal">/ 月</span></p>
-                    <p class="text-xs mt-1 opacity-80">最初の3回は無料でお試しいただけます</p>
-                </div>
-
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6 text-sm text-center">
-                    税理士事務所様向けのライセンスプランもご用意しております。<br>
-                    顧問先への付加価値提供ツールとしてご活用ください。
-                </div>
-
-                <div class="flex flex-col space-y-3">
-                    <a href="/cdn-cgi/l/email-protection#3d54535b527d58455c504d5158135e5250024e485f57585e4900da88b1d8ab8bd8bc98d8878ad59587dbab906d4f52dab4b5debc96d4ab9fdebca4debfb6debcb7d8a8b2debcb9d8adb5debfb2debca6" class="w-full py-3 bg-brand-accent hover:bg-teal-500 text-white font-bold rounded-lg shadow text-center transition-colors">
-                        詳細を問い合わせる（メール）
+                <!-- 購入案内 -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-5 text-sm text-center">
+                    <p class="font-bold text-brand-main mb-1">まだご購入されていない方</p>
+                    <p class="text-xs text-gray-500 mb-3">税理士事務所様向けのライセンスプランもご用意しております。</p>
+                    <a href="mailto:info@spc-jp.com" class="inline-block px-6 py-2 bg-brand-main hover:bg-gray-800 text-white font-bold rounded-lg text-sm transition-colors">
+                        詳細を問い合わせる
                     </a>
-                    <button onclick="closeProModal()" class="w-full py-3 bg-white border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-colors">
-                        閉じる
-                    </button>
                 </div>
+
+                <button onclick="closeProModal()" class="w-full py-3 bg-white border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    閉じる
+                </button>
             </div>
         </div>
     </div>
@@ -1355,6 +1363,48 @@
         // ============================================================
         // PRO版 AI分析機能
         // ============================================================
+        // タイトルクリックで初期画面に戻る
+        function goToStart() {
+            switchScreen('screen-start');
+            const savedData = localStorage.getItem('keiei_shindan_result');
+            if (savedData) {
+                document.getElementById('previous-result-area').classList.remove('hidden-screen');
+            }
+        }
+
+        // パスワード認証でPRO解除
+        const PRO_PASSWORD = 'keiei2025';  // ← ここを実際のパスワードに変更してください
+        const PRO_UNLOCK_KEY = 'keiei_shindan_pro_unlocked';
+
+        function isProUnlocked() {
+            return localStorage.getItem(PRO_UNLOCK_KEY) === 'true';
+        }
+
+        function checkProPassword() {
+            const input = document.getElementById('pro-password-input');
+            const errEl = document.getElementById('pro-password-error');
+            if (!input) return;
+            if (input.value === PRO_PASSWORD) {
+                unlockPro();
+            } else {
+                errEl.classList.remove('hidden-screen');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function unlockPro() {
+            localStorage.setItem(PRO_UNLOCK_KEY, 'true');
+            localStorage.removeItem(TRIAL_KEY);
+            closeProModal();
+            updateTrialBadge();
+            alert('✅ PRO版が有効になりました！\nAIアドバイスを何度でもご利用いただけます。');
+            // 結果画面にいればAI呼び出しを自動実行
+            if (!document.getElementById('screen-result').classList.contains('hidden-screen')) {
+                callAiAdvice();
+            }
+        }
+
         // トライアルリセット（開発・テスト用 / 設定モーダルから呼び出し）
         function resetTrialCount() {
             if(confirm('AIアドバイスのトライアル回数をリセットしますか？\n（無料3回が復活します）')) {
@@ -1388,20 +1438,31 @@
         }
 
         function updateTrialBadge() {
+            const badge = document.getElementById('trial-badge');
+            const btn   = document.getElementById('btn-ai-advice');
+            if (!badge || !btn) return;
+            if (isProUnlocked()) {
+                badge.textContent = 'PRO版';
+                badge.classList.add('bg-brand-accent', 'text-white');
+                badge.classList.remove('bg-white', 'text-brand-main');
+                btn.textContent = '🤖 AIアドバイスを再生成する';
+                btn.disabled    = false;
+                return;
+            }
             const used   = getTrialCount();
             const remain = MAX_TRIAL - used;
-            const badge  = document.getElementById('trial-badge');
-            const btn    = document.getElementById('btn-ai-advice');
-            if (!badge || !btn) return;
             if (remain > 0) {
                 badge.textContent = `無料あと${remain}回`;
-                btn.textContent   = `🤖 AIアドバイスを見る（無料あと${remain}回）`;
-                btn.disabled      = false;
+                badge.classList.remove('bg-brand-accent', 'text-white');
+                badge.classList.add('bg-white', 'text-brand-main');
+                btn.textContent = `🤖 AIアドバイスを見る（無料あと${remain}回）`;
+                btn.disabled    = false;
             } else {
-                badge.textContent     = 'PRO版に登録';
+                badge.textContent = 'PRO版に登録';
                 badge.classList.add('bg-brand-accent', 'text-white');
                 badge.classList.remove('bg-white', 'text-brand-main');
                 btn.textContent = '🔒 PRO版でAI分析を続ける';
+                btn.disabled    = false;
             }
         }
 
@@ -1411,7 +1472,8 @@
             const data = JSON.parse(saved);
             const used = getTrialCount();
 
-            if (used >= MAX_TRIAL) {
+            // PRO解除済みならトライアル上限を無視
+            if (!isProUnlocked() && used >= MAX_TRIAL) {
                 openProModal();
                 return;
             }
