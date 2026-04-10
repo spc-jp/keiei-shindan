@@ -187,8 +187,33 @@
         </div>
     </header>
 
+    <!-- ================= トライアルバナー ================= -->
+    <div id="trial-banner" class="fixed top-[72px] left-0 right-0 z-30 no-print">
+        <!-- 未使用：ゴールドバナー -->
+        <div id="banner-fresh" class="hidden-screen bg-amber-400 text-amber-900 text-center py-2 px-4 text-sm font-bold shadow-md">
+            🎁 今なら3回まで無料でお試しいただけます（登録不要）
+        </div>
+        <!-- 残り2回 -->
+        <div id="banner-remain2" class="hidden-screen bg-amber-400 text-amber-900 text-center py-2 px-4 text-sm font-bold shadow-md">
+            🎁 無料体験 残り2回（全3回）
+        </div>
+        <!-- 残り1回 -->
+        <div id="banner-remain1" class="hidden-screen bg-amber-400 text-amber-900 text-center py-2 px-4 text-sm font-bold shadow-md">
+            🎁 無料体験 残り1回（全3回）
+        </div>
+        <!-- 終了 -->
+        <div id="banner-end" class="hidden-screen bg-red-500 text-white text-center py-2 px-4 text-sm font-bold shadow-md">
+            ⚠️ 無料体験が終了しました　
+            <a href="https://buy.stripe.com/7sY9ASeP8bfn90X7AUcV20u"
+               target="_blank"
+               class="underline hover:opacity-80 transition-opacity">
+               ご購入はこちら →
+            </a>
+        </div>
+    </div>
+
     <!-- メインコンテナ -->
-    <main id="app-container" class="w-full max-w-3xl flex-grow px-4 py-8 pb-24 pt-24">
+    <main id="app-container" class="w-full max-w-3xl flex-grow px-4 py-8 pb-24 pt-32">
         
         <!-- ================= スタート画面 ================= -->
         <section id="screen-start" class="w-full max-w-2xl mx-auto">
@@ -830,6 +855,7 @@
             // テーマの初期化
             const savedTheme = localStorage.getItem('keiei_shindan_theme') || 'light';
             setTheme(savedTheme, false);
+            updateTrialBanner();
             const themeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
             if (themeRadio) themeRadio.checked = true;
         });
@@ -1074,6 +1100,7 @@
 
             // AIボタン状態を最新に更新
             updateTrialBadge();
+            updateTrialBanner();
 
             // 軸別カード
             const catContainer = document.getElementById('category-scores-container');
@@ -1357,6 +1384,39 @@
         // ============================================================
         // PRO版 AI分析機能
         // ============================================================
+        // ===============================
+        // トライアルバナー制御
+        // ===============================
+        function updateTrialBanner() {
+            const ids = ['banner-fresh','banner-remain2','banner-remain1','banner-end'];
+            // 全部隠す
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden-screen');
+                    el.style.setProperty('display','none','important');
+                }
+            });
+
+            if (isProUnlocked()) {
+                // PRO解除済みはバナー非表示
+                return;
+            }
+
+            const used = getTrialCount();
+            let showId = '';
+            if      (used === 0) showId = 'banner-fresh';
+            else if (used === 1) showId = 'banner-remain2';
+            else if (used === 2) showId = 'banner-remain1';
+            else                 showId = 'banner-end';
+
+            const el = document.getElementById(showId);
+            if (el) {
+                el.classList.remove('hidden-screen');
+                el.style.setProperty('display','block','important');
+            }
+        }
+
         // タイトルクリックで初期画面に戻る
         function goToStart() {
             switchScreen('screen-start');
@@ -1392,6 +1452,7 @@
             localStorage.removeItem(TRIAL_KEY);
             closeProModal();
             updateTrialBadge();
+            updateTrialBanner();
             alert('✅ PRO版が有効になりました！\nAIアドバイスを何度でもご利用いただけます。');
             // 結果画面にいればAI呼び出しを自動実行
             if (!document.getElementById('screen-result').classList.contains('hidden-screen')) {
@@ -1501,6 +1562,7 @@
 
                 renderAiAdvice(json.result, data);
                 updateTrialBadge();
+                updateTrialBanner();
 
             } catch (e) {
                 document.getElementById('ai-advice-loading').style.setProperty('display', 'none', 'important');
