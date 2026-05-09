@@ -201,14 +201,23 @@
         <div id="banner-remain1" class="hidden-screen bg-amber-400 text-amber-900 text-center py-2 px-4 text-sm font-bold shadow-md">
             🎁 無料体験 残り1回（全3回）
         </div>
-        <!-- 終了 -->
+        <!-- 無料終了 -->
         <div id="banner-end" class="hidden-screen bg-red-500 text-white text-center py-2 px-4 text-sm font-bold shadow-md">
             ⚠️ 無料体験が終了しました　
-            <a href="https://buy.stripe.com/7sY9ASeP8bfn90X7AUcV20u"
-               target="_blank"
-               class="underline hover:opacity-80 transition-opacity">
-               ご購入はこちら →
-            </a>
+            <button onclick="openProModal()" class="underline hover:opacity-80 transition-opacity">
+               ライト/プロから選ぶ →
+            </button>
+        </div>
+        <!-- ライト版 利用中 -->
+        <div id="banner-lite" class="hidden-screen bg-emerald-500 text-white text-center py-2 px-4 text-sm font-bold shadow-md">
+            ⭐ ライト版ご利用中　今月のAI残り
+            <span id="banner-lite-remain">30</span>回／30回
+            <button onclick="openProModal()" class="ml-2 underline hover:opacity-80">プロ版にアップグレード</button>
+        </div>
+        <!-- プロ版 利用中 -->
+        <div id="banner-pro" class="hidden-screen bg-brand-main text-white text-center py-2 px-4 text-sm font-bold shadow-md">
+            💎 プロ版ご利用中　今月のAI残り
+            <span id="banner-pro-remain">100</span>回／100回
         </div>
     </div>
 
@@ -535,24 +544,26 @@
         </div>
     </footer>
 
-    <!-- ================= Pro版モーダル ================= -->
+    <!-- ================= プラン選択モーダル（ライト/プロ） ================= -->
     <div id="modal-pro" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden-screen px-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden transform transition-all">
+            <!-- ヘッダー -->
             <div class="bg-brand-main text-white px-6 py-4 flex justify-between items-center">
                 <h3 class="font-bold text-lg flex items-center">
                     <svg class="w-5 h-5 mr-2 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                    AI経営健康診断 Pro版
+                    ライト or プロ を選ぶ
                 </h3>
                 <button onclick="closeProModal()" class="text-gray-300 hover:text-white transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="p-6 max-h-[80vh] overflow-y-auto">
 
-                <!-- パスワード解除エリア -->
-                <div class="bg-brand-bg rounded-xl p-5 mb-5 border border-brand-accent">
+            <div class="p-6 max-h-[85vh] overflow-y-auto">
+
+                <!-- パスワード解除エリア（ライト/プロ共通・自動判定） -->
+                <div class="bg-brand-bg rounded-xl p-5 mb-6 border border-brand-accent">
                     <p class="text-sm font-bold text-brand-main mb-1">🔑 ご購入済みの方はこちら</p>
-                    <p class="text-xs text-gray-500 mb-3">ご購入後にお届けするパスワードを入力してください</p>
+                    <p class="text-xs text-gray-500 mb-3">ライト版・プロ版どちらのパスワードもこちらに入力してください（自動判定）</p>
                     <div class="flex gap-2">
                         <input type="password" id="pro-password-input" placeholder="パスワードを入力"
                             class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-accent"
@@ -565,34 +576,84 @@
                     <p id="pro-password-error" class="text-xs text-red-500 mt-2 hidden-screen">パスワードが違います。もう一度お試しください。</p>
                 </div>
 
-                <!-- PRO版特典リスト -->
-                <p class="text-xs font-bold text-gray-500 mb-3 tracking-wider">Pro版でできること</p>
-                <ul class="space-y-3 mb-5 text-sm text-gray-700">
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span><strong>AIが業種・規模に合わせた</strong>「あなた専用の経営改善レポート」を自動生成</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span>今後3ヶ月の<strong>具体的アクションプラン</strong>をAIが提示（税理士面談資料として活用可）</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span><strong>月次診断の履歴保存</strong>とスコア推移グラフ表示（経営改善の見える化）</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 mr-2 text-brand-safe flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span>AI生成レポートの<strong>PDF出力</strong>（税理士・金融機関への報告書として使用可）</span>
-                    </li>
-                </ul>
+                <p class="text-xs font-bold text-gray-500 mb-3 tracking-wider text-center">ご購入をご検討の方</p>
 
-                <!-- 購入案内 -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-5 text-sm text-center">
-                    <p class="font-bold text-brand-main mb-1">まだご購入されていない方</p>
-                    <p class="text-xs text-gray-500 mb-3">税理士事務所様向けのライセンスプランもご用意しております。</p>
-                    <a href="https://buy.stripe.com/7sY9ASeP8bfn90X7AUcV20u" id="stripe-buy-link" class="inline-block px-6 py-2 bg-brand-main hover:bg-gray-800 text-white font-bold rounded-lg text-sm transition-colors">
-                        Pro版を申し込む（¥2,980/月）
-                    </a>
+                <!-- 2プラン横並び比較カード -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+
+                    <!-- ライト版カード -->
+                    <div class="border-2 border-gray-200 rounded-xl p-5 flex flex-col bg-white">
+                        <div class="text-center mb-3">
+                            <span class="inline-block text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-2">⭐ ライト版</span>
+                            <p class="text-2xl font-bold text-brand-main">¥1,980</p>
+                            <p class="text-xs text-gray-500">買い切り（一括払い・追加課金なし）</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-gray-700 mb-4 flex-grow">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>基本診断（5軸15問・スコア・レーダーチャート）</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span><strong>AI経営アドバイス 月30回</strong>まで</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>PDF出力・印刷対応</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>結果を税理士へメール送信</span>
+                            </li>
+                            <li class="flex items-start text-gray-300">
+                                <span class="mr-1 flex-shrink-0">✗</span>
+                                <span>履歴保存・スコア推移グラフ</span>
+                            </li>
+                        </ul>
+                        <a href="https://note.com/your-note-url" target="_blank" id="lite-buy-link"
+                           class="block w-full text-center px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-sm transition-colors">
+                            noteで購入する
+                        </a>
+                        <p class="text-[10px] text-gray-400 text-center mt-1">※購入後、パスワードがメール送付されます</p>
+                    </div>
+
+                    <!-- プロ版カード（おすすめバッジ付き） -->
+                    <div class="border-2 border-brand-accent rounded-xl p-5 flex flex-col bg-white relative">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-accent text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">🌟 おすすめ</span>
+                        <div class="text-center mb-3">
+                            <span class="inline-block text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full mb-2">💎 プロ版</span>
+                            <p class="text-2xl font-bold text-brand-main">¥2,980<span class="text-sm font-normal">/月</span></p>
+                            <p class="text-xs text-gray-500">月額サブスク（いつでも解約OK）</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-gray-700 mb-4 flex-grow">
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>基本診断（5軸15問・スコア・レーダーチャート）</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span><strong>AI経営アドバイス 月100回</strong>まで</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>PDF出力・印刷対応</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span>結果を税理士へメール送信</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-emerald-500 mr-1 flex-shrink-0">✓</span>
+                                <span><strong>履歴保存・スコア推移グラフ</strong>（経営改善の見える化）</span>
+                            </li>
+                        </ul>
+                        <a href="https://buy.stripe.com/7sY9ASeP8bfn90X7AUcV20u" target="_blank" id="stripe-buy-link"
+                           class="block w-full text-center px-4 py-3 bg-brand-main hover:bg-gray-800 text-white font-bold rounded-lg text-sm transition-colors">
+                            Stripeで申し込む
+                        </a>
+                        <p class="text-[10px] text-gray-400 text-center mt-1">※決済後、パスワードがメール送付されます</p>
+                    </div>
+
                 </div>
 
                 <button onclick="closeProModal()" class="w-full py-3 bg-white border border-gray-300 text-gray-600 font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm">
@@ -1371,13 +1432,17 @@
         }
 
         function clearAllData() {
-            if(confirm('すべてのデータ（診断結果）とAIトライアル回数をクリアしますか？')) {
+            if(confirm('診断結果と無料トライアル回数・今月のAI使用回数をクリアしますか？\n（ライト/プロ版の解除状態は保持されます）')) {
                 localStorage.removeItem('keiei_shindan_result');
                 localStorage.removeItem('keiei_shindan_pro_trial');
+                localStorage.removeItem('keiei_shindan_monthly_usage');
+                // プラン解除状態（lite_unlocked / pro_unlocked）は保持
                 userAnswers = {};
                 closeSettingsModal();
                 switchScreen('screen-start');
                 document.getElementById('previous-result-area').classList.add('hidden-screen');
+                if (typeof updateTrialBadge === 'function') updateTrialBadge();
+                if (typeof updateTrialBanner === 'function') updateTrialBanner();
             }
         }
 
@@ -1385,10 +1450,10 @@
         // PRO版 AI分析機能
         // ============================================================
         // ===============================
-        // トライアルバナー制御
+        // トライアルバナー制御（3プラン対応）
         // ===============================
         function updateTrialBanner() {
-            const ids = ['banner-fresh','banner-remain2','banner-remain1','banner-end'];
+            const ids = ['banner-fresh','banner-remain2','banner-remain1','banner-end','banner-lite','banner-pro'];
             // 全部隠す
             ids.forEach(id => {
                 const el = document.getElementById(id);
@@ -1398,11 +1463,35 @@
                 }
             });
 
-            if (isProUnlocked()) {
-                // PRO解除済みはバナー非表示
+            const plan = getActivePlan();
+
+            // プロ版
+            if (plan === 'pro') {
+                const remain = PLAN_LIMITS.pro - getMonthlyUsage();
+                const remainEl = document.getElementById('banner-pro-remain');
+                if (remainEl) remainEl.textContent = Math.max(remain, 0);
+                const el = document.getElementById('banner-pro');
+                if (el) {
+                    el.classList.remove('hidden-screen');
+                    el.style.setProperty('display','block','important');
+                }
                 return;
             }
 
+            // ライト版
+            if (plan === 'lite') {
+                const remain = PLAN_LIMITS.lite - getMonthlyUsage();
+                const remainEl = document.getElementById('banner-lite-remain');
+                if (remainEl) remainEl.textContent = Math.max(remain, 0);
+                const el = document.getElementById('banner-lite');
+                if (el) {
+                    el.classList.remove('hidden-screen');
+                    el.style.setProperty('display','block','important');
+                }
+                return;
+            }
+
+            // 無料（既存ロジック）
             const used = getTrialCount();
             let showId = '';
             if      (used === 0) showId = 'banner-fresh';
@@ -1426,12 +1515,65 @@
             }
         }
 
-        // パスワード認証でPRO解除
-        const PRO_PASSWORD = 'keiei2025';  // ← ここを実際のパスワードに変更してください
-        const PRO_UNLOCK_KEY = 'keiei_shindan_pro_unlocked';
+        // パスワード認証でPRO/ライト解除
+        const LITE_PASSWORD = 'lite2025';   // ← noteで配布するライト版パスワード
+        const PRO_PASSWORD  = 'pro2025';    // ← Stripe決済後に配布するプロ版パスワード
+        const LITE_UNLOCK_KEY = 'keiei_shindan_lite_unlocked';
+        const PRO_UNLOCK_KEY  = 'keiei_shindan_pro_unlocked';
+        const MONTHLY_USAGE_KEY = 'keiei_shindan_monthly_usage'; // {"2026-05": 12} 形式
 
+        // プランごとの月次AI上限
+        const PLAN_LIMITS = { free: 3, lite: 30, pro: 100 };
+
+        // --- プラン判定 ---
         function isProUnlocked() {
             return localStorage.getItem(PRO_UNLOCK_KEY) === 'true';
+        }
+        function isLiteUnlocked() {
+            return localStorage.getItem(LITE_UNLOCK_KEY) === 'true';
+        }
+        function getActivePlan() {
+            if (isProUnlocked())  return 'pro';
+            if (isLiteUnlocked()) return 'lite';
+            return 'free';
+        }
+
+        // --- 月次カウンタ ---
+        function getCurrentMonthKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+        function getMonthlyUsage() {
+            try {
+                const data = JSON.parse(localStorage.getItem(MONTHLY_USAGE_KEY) || '{}');
+                return data[getCurrentMonthKey()] || 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+        function incrementMonthlyUsage() {
+            let data = {};
+            try {
+                data = JSON.parse(localStorage.getItem(MONTHLY_USAGE_KEY) || '{}');
+            } catch (e) {
+                data = {};
+            }
+            const key = getCurrentMonthKey();
+            data[key] = (data[key] || 0) + 1;
+            // 古い月のデータは整理（直近3ヶ月分のみ保持）
+            const keep = {};
+            const sortedKeys = Object.keys(data).sort().slice(-3);
+            sortedKeys.forEach(k => keep[k] = data[k]);
+            localStorage.setItem(MONTHLY_USAGE_KEY, JSON.stringify(keep));
+        }
+
+        // --- 残り回数（プラン別）---
+        function getRemainingCount() {
+            const plan = getActivePlan();
+            if (plan === 'free') {
+                return MAX_TRIAL - getTrialCount();
+            }
+            return PLAN_LIMITS[plan] - getMonthlyUsage();
         }
 
         function checkProPassword() {
@@ -1440,6 +1582,8 @@
             if (!input) return;
             if (input.value === PRO_PASSWORD) {
                 unlockPro();
+            } else if (input.value === LITE_PASSWORD) {
+                unlockLite();
             } else {
                 errEl.classList.remove('hidden-screen');
                 input.value = '';
@@ -1450,11 +1594,30 @@
         function unlockPro() {
             localStorage.setItem(PRO_UNLOCK_KEY, 'true');
             localStorage.removeItem(TRIAL_KEY);
+            // ライト版が先に有効化されていた場合はクリア（プロが上位互換）
+            localStorage.removeItem(LITE_UNLOCK_KEY);
             closeProModal();
             updateTrialBadge();
             updateTrialBanner();
-            alert('✅ PRO版が有効になりました！\nAIアドバイスを何度でもご利用いただけます。');
-            // 結果画面にいればAI呼び出しを自動実行
+            alert('💎 プロ版が有効になりました！\nAIアドバイスを月100回までご利用いただけます。');
+            if (!document.getElementById('screen-result').classList.contains('hidden-screen')) {
+                callAiAdvice();
+            }
+        }
+
+        function unlockLite() {
+            // 既にプロが有効ならライト解除はしない
+            if (isProUnlocked()) {
+                alert('既にプロ版が有効です。');
+                closeProModal();
+                return;
+            }
+            localStorage.setItem(LITE_UNLOCK_KEY, 'true');
+            localStorage.removeItem(TRIAL_KEY);
+            closeProModal();
+            updateTrialBadge();
+            updateTrialBanner();
+            alert('⭐ ライト版が有効になりました！\nAIアドバイスを月30回までご利用いただけます。');
             if (!document.getElementById('screen-result').classList.contains('hidden-screen')) {
                 callAiAdvice();
             }
@@ -1471,28 +1634,45 @@
         function updateTrialBadge() {
             const badge = document.getElementById('trial-badge');
             const btn   = document.getElementById('btn-ai-advice');
-            if (!badge || !btn) return;
-            if (isProUnlocked()) {
-                badge.textContent = 'PRO版';
-                badge.classList.add('bg-brand-accent', 'text-white');
-                badge.classList.remove('bg-white', 'text-brand-main');
-                btn.textContent = '🤖 AIアドバイスを再生成する';
-                btn.disabled    = false;
-                return;
+            if (!btn) return;
+            const plan      = getActivePlan();
+            const remaining = getRemainingCount();
+
+            // バッジ更新（要素が存在する場合のみ）
+            if (badge) {
+                if (plan === 'pro') {
+                    badge.textContent = 'PRO版';
+                    badge.classList.add('bg-brand-accent', 'text-white');
+                    badge.classList.remove('bg-white', 'text-brand-main');
+                } else if (plan === 'lite') {
+                    badge.textContent = 'ライト版';
+                    badge.classList.add('bg-emerald-500', 'text-white');
+                    badge.classList.remove('bg-white', 'text-brand-main', 'bg-brand-accent');
+                } else if (remaining > 0) {
+                    badge.textContent = `無料あと${remaining}回`;
+                    badge.classList.remove('bg-brand-accent', 'text-white', 'bg-emerald-500');
+                    badge.classList.add('bg-white', 'text-brand-main');
+                } else {
+                    badge.textContent = 'プラン選択';
+                    badge.classList.add('bg-brand-accent', 'text-white');
+                    badge.classList.remove('bg-white', 'text-brand-main', 'bg-emerald-500');
+                }
             }
-            const used   = getTrialCount();
-            const remain = MAX_TRIAL - used;
-            if (remain > 0) {
-                badge.textContent = `無料あと${remain}回`;
-                badge.classList.remove('bg-brand-accent', 'text-white');
-                badge.classList.add('bg-white', 'text-brand-main');
-                btn.textContent = `🤖 AIアドバイスを見る（無料あと${remain}回）`;
+
+            // ボタン文言更新
+            if (plan === 'pro') {
+                btn.textContent = `🤖 AIアドバイスを見る（プロ版・今月あと${remaining}回／100回）`;
+                btn.disabled    = remaining <= 0;
+                if (remaining <= 0) btn.textContent = '⚠️ 今月の上限に達しました（来月リセット）';
+            } else if (plan === 'lite') {
+                btn.textContent = `🤖 AIアドバイスを見る（ライト版・今月あと${remaining}回／30回）`;
+                btn.disabled    = remaining <= 0;
+                if (remaining <= 0) btn.textContent = '⚠️ 今月の上限に達しました（プロ版にアップグレード）';
+            } else if (remaining > 0) {
+                btn.textContent = `🤖 AIアドバイスを見る（無料あと${remaining}回）`;
                 btn.disabled    = false;
             } else {
-                badge.textContent = 'PRO版に登録';
-                badge.classList.add('bg-brand-accent', 'text-white');
-                badge.classList.remove('bg-white', 'text-brand-main');
-                btn.textContent = '🔒 PRO版でAI分析を続ける';
+                btn.textContent = '🔒 ライト or プロでAI分析を続ける';
                 btn.disabled    = false;
             }
         }
@@ -1513,11 +1693,23 @@
                 return;
             }
 
-            // トライアル・PRO判定
-            const used = getTrialCount();
-            if (!isProUnlocked() && used >= MAX_TRIAL) {
-                openProModal();
-                return;
+            // プラン別 上限判定
+            const plan      = getActivePlan();
+            const remaining = getRemainingCount();
+
+            if (remaining <= 0) {
+                if (plan === 'pro') {
+                    alert('⚠️ 今月のAI利用上限（100回）に達しました。\n来月1日にリセットされます。');
+                    return;
+                } else if (plan === 'lite') {
+                    alert('⚠️ 今月のAI利用上限（30回）に達しました。\nプロ版（月100回）へのアップグレードをご検討ください。');
+                    openProModal();
+                    return;
+                } else {
+                    // 無料 → モーダルでプラン選択へ誘導
+                    openProModal();
+                    return;
+                }
             }
 
             // UI ローディング開始
@@ -1555,9 +1747,11 @@
                 const json = await res.json();
                 if (!json.ok) throw new Error(json.error || 'AIからの応答が不正です');
 
-                // トライアル消費（PRO解除済みなら消費しない）
-                if (!isProUnlocked()) {
-                    localStorage.setItem(TRIAL_KEY, String(used + 1));
+                // カウンタ消費（プラン別）
+                if (plan === 'free') {
+                    localStorage.setItem(TRIAL_KEY, String(getTrialCount() + 1));
+                } else {
+                    incrementMonthlyUsage();
                 }
 
                 renderAiAdvice(json.result, data);
