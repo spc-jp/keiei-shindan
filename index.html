@@ -1460,6 +1460,32 @@
             }
         }
 
+        function updateTrialBanner() {
+            const bannerActive  = document.getElementById('banner-active');
+            const bannerExpired = document.getElementById('banner-expired');
+            const bannerText    = document.getElementById('banner-text');
+            if (!bannerActive || !bannerExpired || !bannerText) return;
+
+            if (isProUnlocked()) {
+                document.getElementById('trial-banner').style.setProperty('display','none','important');
+                return;
+            }
+            const used   = getTrialCount();
+            const remain = MAX_TRIAL - used;
+            if (remain >= MAX_TRIAL) {
+                bannerText.textContent = '🎁 今なら3回まで無料でお試しいただけます（登録不要）';
+                bannerActive.style.setProperty('display','flex','important');
+                bannerExpired.style.setProperty('display','none','important');
+            } else if (remain > 0) {
+                bannerText.textContent = `🎁 無料体験 残り${remain}回（全${MAX_TRIAL}回）`;
+                bannerActive.style.setProperty('display','flex','important');
+                bannerExpired.style.setProperty('display','none','important');
+            } else {
+                bannerActive.style.setProperty('display','none','important');
+                bannerExpired.style.setProperty('display','flex','important');
+            }
+        }
+
         const WORKER_URL = 'https://keiei-shindan-ai.yymmatsu.workers.dev';
         const TRIAL_KEY  = 'keiei_shindan_pro_trial';
         const MAX_TRIAL  = 3;
